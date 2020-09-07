@@ -1,5 +1,5 @@
 <hr>
-# CTFsub, a submit system for A/D CTF 
+<h1> CTFsub, a submit system for A/D CTF </h1>
 <hr>
 
 <br>
