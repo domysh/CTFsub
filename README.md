@@ -46,15 +46,17 @@ Program your attack using python template attack_template.py, you can run it in 
     </li>
   </ol>
 
-<li>Create a web endpoint for submit easly (also with a simply get request) flags form external scripts (for example with JS)
+<li>Create a web endpoint for submit easly (also with a simply get request) flags form external scripts (for example with JS)</li>
+
+</ol>
+
 ```
 Example of endpoint:
 http://<my_team_ip>:<port_of_webapi>/<string_with_flags>
 or
 http://<my_team_ip>:<port_of_webapi>/ POST:{'data':<string_with_flags>}
 ```
-</li>
-</ol>
 
+### Poliba team CCIT2020
 ---
 
