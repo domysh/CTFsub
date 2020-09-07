@@ -1,14 +1,14 @@
 
 # CTFsub, a submit system for A/D CTF
 
-<br>
+
 ```
 This is for now a secret repo created for CCIT 2020 A/D final
 Here you will find more information about the project 
 after the race, so now the project is concentrate for the CCIT and after this become public
 and more easly managed for other races
 ```
-<br>
+
 
 
 # Some Helps
