@@ -1,6 +1,6 @@
-```
+
 # CTFsub, a submit system for A/D CTF
-```
+
 <br>
 ```
 This is for now a secret repo created for CCIT 2020 A/D final
