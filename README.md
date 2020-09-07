@@ -26,9 +26,8 @@ Program your attack using python template attack_template.py, you can run it in 
 ---
 
 # TODO list
-<ol>
-<li>Integrate in attack CONFIG var the possibility to set a custom TIMEOUT for the program (in process_controller dict), making more effincent the entire script but in the same time permitt to run heavy script avoiding that this have killed by CTFsub</li>
 
+<ol>
 <li>Test hardly all the implementation on process_controller for be sure that all it's working correctly</li>
 
 <li>Create a shell for run time functions and mods: Functions of the shell
