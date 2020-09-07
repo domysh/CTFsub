@@ -28,7 +28,9 @@ Program your attack using python template attack_template.py, you can run it in 
 # TODO list
 
 1- Integrate in attack CONFIG var the possibility to set a custom TIMEOUT for the program (in process_controller dict), making more effincent the entire script but in the same time permitt to run heavy script avoiding that this have killed by CTFsub
+
 2- Test hardly all the implementation on process_controller for be sure that all it's working correctly
+
 3- Create a shell for run time functions and mods:
   functions of the shell{
     1- Modify auto_blacklist status (reset or block a ip on an attack)
@@ -41,6 +43,7 @@ Program your attack using python template attack_template.py, you can run it in 
         5- block or start rounds (bypassing of blocking timing)
       }
   }
+
 4- Create a web endpoint for submit easly (also with a simply get request) flags form external scripts (for example with JS)
 ```
 Example of endpoint:
