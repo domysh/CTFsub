@@ -31,13 +31,11 @@ Program your attack using python template attack_template.py, you can run it in 
 
 <li>Test hardly all the implementation on process_controller for be sure that all it's working correctly</li>
 
-<li>Create a shell for run time functions and mods:<br>
-  <h5> functions of the shell</h5>
+<li>Create a shell for run time functions and mods: Functions of the shell
   <ol>
     <li>Modify auto_blacklist status (reset or block a ip on an attack)</li>
     <li>Modify config vars like the global timeout, or the thread limit etc...</li>
-    <li>
-      Manage attacks
+    <li>Manage attacks
       <ol>
         <li>Create whitelist/blacklist of ip,</li>
         <li>Start or stop a specific attack script,</li>
