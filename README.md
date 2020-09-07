@@ -1,6 +1,7 @@
 
 # CTFsub, a submit system for A/D CTF
 
+---
 
 ```
 This is for now a secret repo created for CCIT 2020 A/D final
@@ -9,7 +10,7 @@ after the race, so now the project is concentrate for the CCIT and after this be
 and more easly managed for other races
 ```
 
-
+---
 
 # Some Helps
 ## Execution
@@ -29,4 +30,5 @@ after you confirmed that the script is working
 go on coping the file in attacks folder
 for integrate it with the system
 
+---
 
