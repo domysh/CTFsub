@@ -56,7 +56,7 @@ http://<my_team_ip>:<port_of_webapi>/<string_with_flags>
 or
 http://<my_team_ip>:<port_of_webapi>/ POST:{'data':<string_with_flags>}
 ```
-
+---
 ### Poliba team CCIT2020
 ---
 
