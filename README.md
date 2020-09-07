@@ -37,7 +37,7 @@ Program your attack using python template attack_template.py, you can run it in 
     <li>Modify auto_blacklist status (reset or block a ip on an attack)</li>
     <li>Modify config vars like the global timeout, or the thread limit etc...</li>
     <li>
-      <h6>Manage attacks</h6>
+      Manage attacks
       <ol>
         <li>Create whitelist/blacklist of ip,</li>
         <li>Start or stop a specific attack script,</li>
