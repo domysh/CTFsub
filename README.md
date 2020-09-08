@@ -5,7 +5,8 @@
 
 ```
 This is for now a secret repo created for CCIT 2020 A/D final
-After the race, here you will find more informations about the project, actually the project is intended for the CCIT and after this it will become public
+After the race, here you will find more informations about the project,
+actually the project is intended for the CCIT and after this it will become public
 and more easly managed for other races
 ```
 
