@@ -12,7 +12,7 @@ def run(ip,log,g_var):
     g_var_set(g_var,'count',0)
     if ip == "10.10.7.1":
         raise Exception('lol')
-    sleep(rnd(2,6)) #Simulating work
+    sleep(rnd(2,10)) #Simulating work
     
     log.info(f"Success! Test g_var status: {g_var['count']}")
     g_var['count'] +=1
@@ -28,7 +28,11 @@ of his status (if the service not responde skip the ip)
 if active_ctrl is None or you remove CONFIG, CTFsub will skip this
 control (You can segnal off status of the service raising AttackRequestRefused())
 '''
-CONFIG = {'alive_ctrl':None}
+CONFIG = {
+    'alive_ctrl':None,
+    'on':True,
+    'timeout':5
+}
 
 """
 if you are in the situation that you have to 

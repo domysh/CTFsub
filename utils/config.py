@@ -35,10 +35,7 @@ TIME_TO_WAIT_IN_BLACKLIST = 6
 PRINT_LOGS = False
 
 GLOBAL_DATA_FILE = pjoin(ROOT_DIR,'g_var.json')
-utils.fun.create_file(GLOBAL_DATA_FILE)
-
 GLOBAL_SETTINGS_FILE = pjoin(ROOT_DIR,'settings.json')
-utils.fun.create_file(GLOBAL_SETTINGS_FILE)
 
 GLOBAL_LOG_FILE = pjoin(LOG_FOLDER,'CTFsub.log')
 utils.fun.create_file(GLOBAL_LOG_FILE)

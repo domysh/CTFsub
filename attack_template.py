@@ -27,7 +27,11 @@ of his status (if the service not responde skip the ip)
 if active_ctrl is None or you remove CONFIG, CTFsub will skip this
 control (You can segnal off status of the service raising AttackRequestRefused())
 '''
-CONFIG = {'alive_ctrl':None}
+CONFIG = {
+    'alive_ctrl':None,
+    'on':True,
+    'timeout':None
+}
 
 """
 if you are in the situation that you have to 

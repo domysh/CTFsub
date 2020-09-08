@@ -3,6 +3,7 @@ import multiprocessing, time, threading
 from multiprocessing import Pool
 import utils.config, utils.fun
 from time import sleep
+from utils.syjson import SyJson
 
 
 #Creating the loggers
@@ -37,31 +38,8 @@ config:{
 
 #global vars synced with relative files
 class glob: 
-    constant_vars = {}
-    commit_lock = threading.Lock()
-    settings = {}
-    settings_lock = threading.Lock()
-
-#Save changes in constant_vars in file g_var.json
-def commit_vars_changes():
-    glob.commit_lock.acquire()
-    open(utils.config.GLOBAL_DATA_FILE,'wt').write(json.dumps(glob.constant_vars))
-    glob.commit_lock.release()
-
-#Save changes in settings in file settings.json
-def commit_settings():
-    glob.settings_lock.acquire()
-    open(utils.config.GLOBAL_SETTINGS_FILE,'wt').write(json.dumps(glob.settings))
-    glob.settings_lock.release()
-
-#Load Glob vars (charging it from file (to get back old status))
-fl = open(utils.config.GLOBAL_DATA_FILE,'rt').read()
-if fl != "":
-    glob.constant_vars = json.loads(fl)
-
-fl = open(utils.config.GLOBAL_SETTINGS_FILE,'rt').read()
-if fl != "":
-    glob.settings = json.loads(fl)  
+    constant_vars = SyJson(utils.config.GLOBAL_DATA_FILE)
+    settings = SyJson(utils.config.GLOBAL_SETTINGS_FILE)
 
 #Function used for submit a flag
 def submit_flag(flags:list):
@@ -115,7 +93,6 @@ def start_attack(py_attack,assigned_ip):
         #Set up structure for save permanent vars
         if this_attack.attack_name not in glob.constant_vars.keys():
             glob.constant_vars[this_attack.attack_name] = {}
-            commit_vars_changes()
         if assigned_ip in glob.constant_vars[this_attack.attack_name].keys():
             var_dict = glob.constant_vars[this_attack.attack_name][assigned_ip]
         
@@ -131,14 +108,12 @@ def start_attack(py_attack,assigned_ip):
 
         # If thread is still active we kill it
         if p.is_alive():
-            log.info(f'GLOBAL_TIMEOUT {py_attack} on {assigned_ip} finished! killing...')
+            log.info(f'{py_attack} on {assigned_ip} This thread taked over {timeout_process} seconds, killing...')
             p.terminate()
             p.join()
         else:
             #get the result (sending the flag and saving changes of permanent vars)
             flags_obtained = res.get()
-            glob.constant_vars[this_attack.attack_name][assigned_ip] = res.get()
-            commit_vars_changes()
         
         del this_attack
         
@@ -157,7 +132,6 @@ def start_attack(py_attack,assigned_ip):
                     blacklist_status['excluded'] = True
                     blacklist_status['stopped_times'] = 0
 
-            commit_settings()
 
         #Send a different message on log for different situations
         if flags_obtained is None: # Unexpected error
@@ -173,7 +147,6 @@ def start_attack(py_attack,assigned_ip):
                     'fail_times':0,
                     'stopped_times':0
             }
-            commit_settings()
             submit_flag(flags_obtained)
             
     #Fail case (return result form attack script isn't what we expected)
@@ -271,7 +244,6 @@ def main():
                 attack_blacklist = glob.settings['blacklist'][py_f][ip_to_attack]
                 attack_settings = glob.settings['process_controller'][py_f]
                 
-                commit_settings()
 
                 #Choose what action do following the istruction in settings dict
                 if attack_settings['on']: # If the attack is enabled
@@ -292,11 +264,9 @@ def main():
                         if attack_blacklist['stopped_times'] >= utils.config.TIME_TO_WAIT_IN_BLACKLIST:
                             log.warning(f'auto_blacklist enabled on ip {ip_to_attack} of {py_f} attack ... trying anyway to execute')
                             attack_blacklist['stopped_times'] = -1 # If success -1 remember to reset blacklist
-                            commit_settings()
                         else:
                             log.warning(f'auto_blacklist enabled on ip {ip_to_attack} of {py_f} attack ... skipping')
                             attack_blacklist['stopped_times'] += 1
-                            commit_settings()
                             continue
                 else:
                     log.warning(f'{py_f} attack disabilited! Skipping...')
