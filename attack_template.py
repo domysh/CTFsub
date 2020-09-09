@@ -9,6 +9,7 @@ IP_ADDRESS_DEBUG = "10.10.1.1"
 def run(ip,log,g_var):
     from time import sleep
     from random import randint as rnd
+
     g_var_set(g_var,'count',0)
 
     sleep(rnd(2,6)) #Simulating work

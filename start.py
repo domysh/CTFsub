@@ -73,7 +73,7 @@ def start_attack(py_attack,assigned_ip):
             log.error(f'{py_attack} file havent a Attack Class that is subclass of AttackModel... Skipping attack...')
             return
         #Get the flag and submit
-        flags_obtained = 'service_closed'
+        flags_obtained = 'leak_closed'
 
         #Get attack settings
         attack_settings = glob.settings['process_controller'][py_attack]
@@ -252,16 +252,17 @@ def main():
                             log.warning(f'{py_f} attack on IP {ip_to_attack} in blacklist... skipping')
                             continue
                     #Auto blacklist control
-                    if attack_blacklist['excluded']:
-                        if attack_blacklist['stopped_times'] == -1:
-                            pass # Last time the service was closed so we have to try again to attack
-                        if attack_blacklist['stopped_times'] >= utils.config.TIME_TO_WAIT_IN_BLACKLIST:
-                            log.warning(f'auto_blacklist enabled on ip {ip_to_attack} of {py_f} attack ... trying anyway to execute')
-                            attack_blacklist['stopped_times'] = -1 # If success -1 remember to reset blacklist
-                        else:
-                            log.warning(f'auto_blacklist enabled on ip {ip_to_attack} of {py_f} attack ... skipping')
-                            attack_blacklist['stopped_times'] += 1
-                            continue
+                    if utils.config.AUTO_BLACKLIST_ON:
+                        if attack_blacklist['excluded']:
+                            if attack_blacklist['stopped_times'] == -1:
+                                pass # Last time the service was closed so we have to try again to attack
+                            if attack_blacklist['stopped_times'] >= utils.config.TIME_TO_WAIT_IN_BLACKLIST:
+                                log.warning(f'auto_blacklist enabled on ip {ip_to_attack} of {py_f} attack ... trying anyway to execute')
+                                attack_blacklist['stopped_times'] = -1 # If success -1 remember to reset blacklist
+                            else:
+                                log.warning(f'auto_blacklist enabled on ip {ip_to_attack} of {py_f} attack ... skipping')
+                                attack_blacklist['stopped_times'] += 1
+                                continue
                 else:
                     log.warning(f'{py_f} attack disabilited! Skipping...')
                     break
