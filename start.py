@@ -88,14 +88,7 @@ def start_attack(py_attack,assigned_ip):
         #Queue for get the result from Process used for put a TIMEOUT at the attack
         res = multiprocessing.Queue()
 
-        var_dict = {}
-        
-        #Set up structure for save permanent vars
-        if this_attack.attack_name not in glob.constant_vars.keys():
-            glob.constant_vars[this_attack.attack_name] = {}
-        if assigned_ip in glob.constant_vars[this_attack.attack_name].keys():
-            var_dict = glob.constant_vars[this_attack.attack_name][assigned_ip]
-        
+        var_dict = glob.constant_vars[this_attack.attack_name][assigned_ip].var()
         # choose what timeout time to use
         timeout_process = utils.config.TIMEOUT_ATTACK
         if not attack_settings['timeout'] is None:
@@ -114,6 +107,7 @@ def start_attack(py_attack,assigned_ip):
         else:
             #get the result (sending the flag and saving changes of permanent vars)
             flags_obtained = res.get()
+            glob.constant_vars[this_attack.attack_name][assigned_ip].sync(res.get())
         
         del this_attack
         
@@ -157,10 +151,6 @@ def start_attack(py_attack,assigned_ip):
 def main():
     log.info('CTFsub is starting !')
     while True:
-        
-        #Get start time for calculating at the end of the attack how many time have to wait
-        last_time = time.time()
-
         #Wait for find python attack files
         wait_for_attacks = False
         while True:  
@@ -175,6 +165,9 @@ def main():
                 if wait_for_attacks == True:
                     log.info('Python attack file found! STARTING...')
                 break
+            
+        #Get start time for calculating at the end of the attack how many time have to wait
+        last_time = time.time()
         
         # Start the round
         flag_log.info('ROUND STARTED')
@@ -240,6 +233,7 @@ def main():
                         log.error('ERROR LOADING CONFIG FROM ATTACK')
                         log.exception(e)
                 
+ 
 
                 attack_blacklist = glob.settings['blacklist'][py_f][ip_to_attack]
                 attack_settings = glob.settings['process_controller'][py_f]
@@ -272,6 +266,13 @@ def main():
                     log.warning(f'{py_f} attack disabilited! Skipping...')
                     break
                 
+                #Set up structure for save permanent vars
+                if py_f not in glob.constant_vars.keys():
+                    glob.constant_vars[py_f] = {}
+                    glob.constant_vars[py_f][ip_to_attack] = {}
+                elif ip_to_attack not in glob.constant_vars[py_f].keys():
+                    glob.constant_vars[py_f][ip_to_attack] = {}
+
                 #Starting new thread for attack
                 log.info(f'Starting thread {py_f} attack for {ip_to_attack}')
                 thread_list.append(threading.Thread(target=start_attack,args=(py_f,ip_to_attack)))

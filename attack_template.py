@@ -16,9 +16,7 @@ def run(ip,log,g_var):
     log.info(f"Success! Test g_var status: {g_var['count']}")
     g_var['count'] +=1
     
-    return ['flg{aaaaaaaaaaaaaaaaaaaaaaaaa}',
-    'flag2{aaaaaaaaaaaaabbaaaaaaaaaa}',
-    'a long string that may contain a flag but in this case NOPE']
+    return ['a long string that may contain a flag but in this case NOPE']
 
 
 '''

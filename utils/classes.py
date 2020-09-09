@@ -4,10 +4,12 @@ class AttackModel():
     #Set the attack name as the file name
     def __init__(self,to_run:callable):
         self.fun_to_run = to_run
+        self.attack_name = None
         
 
     # Function used by us for executing attack (creating the logger)
     def get_flags(self,ip:str,glob:dict, res):
+        assert(self.attack_name != None) #This have to be assigned externaly
         self.glob_dict = glob
         #Verify that is a truth path
         self.ip_to_attack = ip

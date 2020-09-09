@@ -7,10 +7,16 @@ class SyJsonObj:
     def __getitem__(self,key):
         raise Exception('Abstract Class')
 
-    def _no_sync(self,key):
+    def _read(self):
         raise Exception('Abstract Class')
     
     def var(self):
+        raise Exception('Abstract Class')
+
+    def _write(self):
+        raise Exception('Abstract Class')
+    
+    def sync(self):
         raise Exception('Abstract Class')
     
     def _get_synced_item(self,key,v):
@@ -29,23 +35,28 @@ class SyJson(SyJsonObj):
     def __init__(self,path:str):
         self.file_path = os.path.abspath(path)
         if not os.path.exists(self.file_path):
-            open(self.file_path,'wt').write('')
+            with open(self.file_path,'wt') as fl:
+                fl.write('')
         self.f_lock = threading.Lock()
-        self.wait_for_save = False
+        self.request_lock = threading.Lock()
     
     def _read(self):
         self.f_lock.acquire()
         try:
-            f = open(self.file_path,'rt').read()
+            with open(self.file_path,'rt') as fl:
+                f = fl.read()
             if f != '': return json.loads(f)
             else: return {}
         finally:
             self.f_lock.release()
 
-    def _write(self,dic:dict):
+    def _write(self,dic):
+        dic = self._get_desynced_item(dic)
         self.f_lock.acquire()
         try:
-            open(self.file_path,'wt').write(json.dumps(dic))
+            with open(self.file_path,'wt') as fl: 
+                fl.write(json.dumps(dic))
+                fl.flush()
         finally:
             self.f_lock.release()
 
@@ -54,14 +65,11 @@ class SyJson(SyJsonObj):
     
     def __str__(self):return self.var().__str__()
 
-    def _no_sync(self,key):
-        return self._read()[key]
+
 
     def __getitem__(self,key):
         d = self._read()
-        if key in d.keys():
-            return self._get_synced_item(key,d[key])
-        raise KeyError('Not valid key')
+        return self._get_synced_item(key,d[key])
         
     def __setitem__(self, key, value):
         value = self._get_desynced_item(value)
@@ -76,18 +84,33 @@ class SyJson(SyJsonObj):
 class InnerIterObject(SyJsonObj):
     def __init__(self,root:SyJsonObj,key):
         self.root = root
+        self.request_lock = self.root.request_lock
         self.root_key = key
 
     def var(self):
-        return self.root.var()[self.root_key]
+        self.request_lock.acquire()
+        try:
+            return self._read()
+        finally:
+            self.request_lock.release()
+
+    def _read(self):
+        return self.root._read()[self.root_key]
 
     def sync(self,var):
-        self.root[self.root_key] = var
+        self.request_lock.acquire()
+        try:
+            self._write(var)
+        finally:
+            self.request_lock.release()
+
+    def _write(self,var):
+        var = self.root._get_desynced_item(var)
+        val = self.root._read() 
+        val[self.root_key] = var
+        self.root._write(val)
 
     def __str__(self):return self.var().__str__()
-
-    def _no_sync(self,key):
-        return self.root._no_sync(self.root_key)[key]
 
     def __getitem__(self,key):
         return self._get_synced_item(key,self.var()[key])
