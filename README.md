@@ -28,8 +28,6 @@ Program your attack using python template attack_template.py, you can run it in 
 # TODO list
 
 <ol>
-<li>Test hardly all the implementation on process_controller for be sure that all it's working correctly</li>
-
 <li>Create a shell for run time functions and mods: Functions of the shell
   <ol>
     <li>Modify auto_blacklist status (reset or block a ip on an attack)</li>

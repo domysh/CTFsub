@@ -9,6 +9,7 @@ IP_ADDRESS_DEBUG = "10.10.1.1"
 def run(ip,log,g_var):
     from time import sleep
     from random import randint as rnd
+
     g_var_set(g_var,'count',0)
 
     sleep(rnd(2,6)) #Simulating work
@@ -16,9 +17,7 @@ def run(ip,log,g_var):
     log.info(f"Success! Test g_var status: {g_var['count']}")
     g_var['count'] +=1
     
-    return ['flg{aaaaaaaaaaaaaaaaaaaaaaaaa}',
-    'flag2{aaaaaaaaaaaaabbaaaaaaaaaa}',
-    'a long string that may contain a flag but in this case NOPE']
+    return ['a long string that may contain a flag but in this case NOPE']
 
 
 '''
@@ -27,7 +26,11 @@ of his status (if the service not responde skip the ip)
 if active_ctrl is None or you remove CONFIG, CTFsub will skip this
 control (You can segnal off status of the service raising AttackRequestRefused())
 '''
-CONFIG = {'alive_ctrl':None}
+CONFIG = {
+    'alive_ctrl':None,
+    'on':True,
+    'timeout':None
+}
 
 """
 if you are in the situation that you have to 
