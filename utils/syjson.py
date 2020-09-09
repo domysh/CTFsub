@@ -6,18 +6,27 @@ class SyJsonObj:
     
     def __getitem__(self,key):
         raise Exception('Abstract Class')
-
-    def _read(self):
-        raise Exception('Abstract Class')
     
     def var(self):
+        self.request_lock.acquire()
+        try:
+            return self._read()
+        finally:
+            self.request_lock.release()
+
+    def sync(self,var):
+        self.request_lock.acquire()
+        try:
+            return self._write(var)
+        finally:
+            self.request_lock.release()
+
+    def _read(self):
         raise Exception('Abstract Class')
 
     def _write(self):
         raise Exception('Abstract Class')
-    
-    def sync(self):
-        raise Exception('Abstract Class')
+
     
     def _get_synced_item(self,key,v):
         if type(v) in (list,tuple):
@@ -59,13 +68,8 @@ class SyJson(SyJsonObj):
                 fl.flush()
         finally:
             self.f_lock.release()
-
-    def var(self):
-        return self._read()
     
     def __str__(self):return self.var().__str__()
-
-
 
     def __getitem__(self,key):
         d = self._read()
@@ -87,22 +91,8 @@ class InnerIterObject(SyJsonObj):
         self.request_lock = self.root.request_lock
         self.root_key = key
 
-    def var(self):
-        self.request_lock.acquire()
-        try:
-            return self._read()
-        finally:
-            self.request_lock.release()
-
     def _read(self):
         return self.root._read()[self.root_key]
-
-    def sync(self,var):
-        self.request_lock.acquire()
-        try:
-            self._write(var)
-        finally:
-            self.request_lock.release()
 
     def _write(self,var):
         var = self.root._get_desynced_item(var)
