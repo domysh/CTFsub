@@ -41,11 +41,14 @@ class SyJsonObj:
         return v
 
 class SyJson(SyJsonObj):
-    def __init__(self,path:str):
+    def __init__(self,path:str, create_file=True):
         self.file_path = os.path.abspath(path)
         if not os.path.exists(self.file_path):
-            with open(self.file_path,'wt') as fl:
-                fl.write('')
+            if create_file:
+                with open(self.file_path,'wt') as fl:
+                    fl.write('')
+            else:
+                raise Exception(f'The file {path} doesn\'t exist!')
         self.f_lock = threading.Lock()
         self.request_lock = threading.Lock()
     
