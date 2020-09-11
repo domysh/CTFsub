@@ -310,7 +310,7 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except (KeyboardInterrupt,InterruptedError,KeyError):
+    except (KeyboardInterrupt,InterruptedError):
         log.fatal('CTRL+C Pressed, Closing')
         print()
         exit()
