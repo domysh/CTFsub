@@ -1,5 +1,6 @@
 import requests, os, logging, re, json
 import multiprocessing, time, threading
+import importlib
 from multiprocessing import Pool
 import utils.config, utils.fun
 from time import sleep
@@ -58,8 +59,10 @@ def submit_flag(flags:list):
     del sended
 
 #Get python module file of the attack and use it
-def get_attack_by_name(attack_name):
-    return getattr(__import__(f"{utils.config.ATTACK_PKG}.{attack_name}"),attack_name)
+def get_attack_by_name(attack_name,cache_use = False):
+    res = getattr(__import__(f"{utils.config.ATTACK_PKG}.{attack_name}"),attack_name)
+    res = importlib.reload(res)
+    return res
 
 #Thread function that have to execute a function
 def start_attack(py_attack,assigned_ip):
@@ -153,6 +156,7 @@ def main():
     while True:
         #Wait for find python attack files
         wait_for_attacks = False
+        #Remove Pycache
         while True:  
             # Get list of python attack files
             to_exec = utils.fun.get_pythonfile_list(utils.config.ATTACKS_FOLDER) #Taking the list of the python executable to run for the attack

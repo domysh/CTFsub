@@ -1,6 +1,12 @@
 #!/bin/sh
 echo "Starting CTFsub process!"
-echo "run ./stop.sh for kill the process"
+
+if test -f "stop.sh"; then
+    echo "The program is running!"
+    echo "Close first it running ./stop.sh"
+    exit
+fi
+echo "run stop.sh for kill the process"
 echo "the file 'stop.sh' will be removed after his execution"
 nohup /usr/bin/python3 start.py >/dev/null 2>&1 < /dev/null &
 echo "#!/bin/sh" > stop.sh

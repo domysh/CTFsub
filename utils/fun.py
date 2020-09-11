@@ -1,4 +1,5 @@
-import datetime, re, utils.config, os, logging, socket
+import datetime, re, utils.config
+import os, logging, socket, ipaddress
 
 def get_time():
     return datetime.datetime.now().strftime("%d-%m-%Y__%H_%M_%S")
@@ -89,3 +90,10 @@ def close_logger(log):
 
 def min_name(name:str):
     return only_this_chars(name.lower().replace(' ','_'),"1234567890abcdefghijklmnopqrstuvwxyz_-.")
+
+def is_valid_ip(ip:str):
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except:pass
+    return False

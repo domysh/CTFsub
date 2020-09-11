@@ -37,7 +37,7 @@ def get_set_gvar(attack_name,ip,key,value = None):
         try:
             val_to_print = glob.g_var[attack_name][ip][key]
             print(f'Gvar on {attack_name}:{ip} [\'{key}\'] = {val_to_print}')
-        except Exception as e:
+        except:
             print(f'Gvar on {attack_name}:{ip} [\'{key}\'] not founded!')
     else:
         try:
@@ -80,6 +80,59 @@ def enable_process(attack_name,set_to=None):
     except:
         print(f'Process controller of {attack_name} attack not founded!')
 
+def filter_get_set(what_list,attack_name,*ips):
+    assert(what_list == 'excluded' or what_list == 'whitelist')
+    enabled_on = True
+    if what_list == 'excluded': enabled_on = False
+    attack_ctrl = None 
+    try:
+        attack_ctrl = glob.settings['process_controller'][attack_name]
+    except:
+        print(f'Process Controller not found for {attack_name}')
+        return 
+    try:
+        status = attack_ctrl['whitelist_on']
+        if len(ips) == 0:
+            if status != enabled_on:
+                print(f'ALLERT! The {what_list} is disabilited')
+            print(f'{what_list} for {attack_name} attack is =',attack_ctrl[f'{what_list}_ip'])
+        else:
+            
+            attack_ctrl[f'{what_list}_ip'] = []
+            if ips[0] != 'no_ip':
+                for ip in ips:
+                    if not utils.fun.is_valid_ip(ip):
+                        print(f'{ip} is not a valid IP address!')
+                        return 
+                    attack_ctrl[f'{what_list}_ip'].append(ip)
+            attack_ctrl['whitelist_on'] = enabled_on
+            print('All done :D')
+    except:
+        print(f'Process Controller of {attack_name} damaged !!!')
+            
+def disable_filters(attack_name):
+    return filter_get_set('excluded',attack_name,'no_ip') 
+
+def get_filter_status(attack_name):
+    attack_ctrl = None 
+    try:
+        attack_ctrl = glob.settings['process_controller'][attack_name]
+    except:
+        print(f'Process Controller not found for {attack_name}')
+        return
+    try:
+        if attack_ctrl['whitelist_on']:
+            print('Now is active the Whitelist')
+            print(f'Here the IPs whitelisted: {attack_ctrl[f"whitelist_ip"]}') 
+        else:
+            array_ip = attack_ctrl[f"excluded_ip"]
+            if len(array_ip) == 0:
+                print('Filters are disabilited!')
+            else:
+                print('Now is active the Blacklist')
+                print(f'Here the IPs blacklisted: {array_ip}') 
+    except:
+        print(f'Process controller of {attack_name} attack not founded!')
 
 class CTFsubShell(cmd.Cmd):
 
@@ -131,18 +184,18 @@ class CTFsubShell(cmd.Cmd):
                 },
                 'filter':{
                     'whitelist':{
-                        'set':{'ip_array::list_all_ip':[print]},
-                        'get':[print]
+                        'set':{'ip_array::list_all_ip':[filter_get_set,('whitelist',)]},
+                        'get':[filter_get_set,('whitelist',)]
                     },
                     'blacklist':{
-                        'set':{'ip_array::list_all_ip':[print]},
-                        'get':[print]
+                        'set':{'ip_array::list_all_ip':[filter_get_set,('excluded',)]},
+                        'get':[filter_get_set,('excluded',)]
                     },
-                    'disable':[print],
-                    'status':[print]
+                    'disable':[disable_filters],
+                    'status':[get_filter_status]
 
                 },
-                'status':[print],
+                'status':[print], # Full status so will be builded at the end of the process command
                 'timeout':{
                     'disable':[print],
                     'set':{
