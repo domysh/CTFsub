@@ -47,18 +47,25 @@ def getParamethers(line):
 def list_process_array():
     return [f for f in utils.fun.get_pythonfile_list(utils.config.ATTACKS_FOLDER) if f != '__init__']
 
+
 def print_div():print('-'*30)
 
 def list_process():
     print_div()
-    for proc_key in glob.settings['process_controller'].keys():
-        proc = glob.settings['process_controller'][proc_key]
-        print(f'Name: {proc_key} - status: {bool_onoff(proc["on"])}')
+    try:
+        for proc_key in glob.settings['process_controller'].keys():
+            proc = glob.settings['process_controller'][proc_key]
+            print(f'Name: {proc_key} - status: {bool_onoff(proc["on"])}')
+    except KeyError:pass
     print_div()
 
-def bool_onoff(v:bool):
-    if v: return 'on'
-    else: return 'off'
+def bool_onoff(v):
+    if type(v) == bool:
+        if v: return 'on'
+        else: return 'off'
+    elif type(v) == str:
+        if v == 'on':return True
+        elif v == 'off': return False
 
 def get_set_gvar(attack_name,ip,key,value = None):
     if value is None:
@@ -109,12 +116,8 @@ def enable_process(attack_name,set_to=None):
         print(f'Process controller of {attack_name} attack not founded!')
 
 def whitelist_get_set(attack_name,*ips):
-    attack_ctrl = None 
-    try:
-        attack_ctrl = glob.settings['process_controller'][attack_name]
-    except:
-        print(f'Process Controller not found for {attack_name}')
-        return 
+    attack_ctrl = get_process_controller(attack_name)
+    if attack_ctrl is None: return
     try:
         status = attack_ctrl['whitelist_on']
         if len(ips) == 0:
@@ -135,12 +138,8 @@ def whitelist_get_set(attack_name,*ips):
         print(f'Process Controller of {attack_name} damaged !!!')
 
 def blacklist_get_set(attack_name,*ips):
-    attack_ctrl = None 
-    try:
-        attack_ctrl = glob.settings['process_controller'][attack_name]
-    except:
-        print(f'Process Controller not found for {attack_name}')
-        return 
+    attack_ctrl = get_process_controller(attack_name)
+    if attack_ctrl is None: return
     try:
         status = attack_ctrl['whitelist_on']
         if len(ips) == 0:
@@ -163,13 +162,16 @@ def blacklist_get_set(attack_name,*ips):
 def disable_filters(attack_name):
     return blacklist_get_set(attack_name,'no_ip') 
 
-def get_filter_status(attack_name):
-    attack_ctrl = None 
+def get_process_controller(attack_name):
     try:
-        attack_ctrl = glob.settings['process_controller'][attack_name]
+        return glob.settings['process_controller'][attack_name]
     except:
         print(f'Process Controller not found for {attack_name}')
-        return
+        return None
+
+def get_filter_status(attack_name):
+    attack_ctrl = get_process_controller(attack_name)
+    if attack_ctrl is None: return
     try:
         if attack_ctrl['whitelist_on']:
             print('Now is active the Whitelist')
@@ -184,6 +186,54 @@ def get_filter_status(attack_name):
     except:
         print(f'Process controller of {attack_name} attack not founded!')
 
+def get_set_timeout(attack_name,time = None):
+    attack_ctrl = get_process_controller(attack_name)
+    if attack_ctrl is None: return
+    try:
+        if time is None:
+            res = attack_ctrl['timeout']
+            if res is None:
+                print('No timeout setted, using global timeout')
+            elif type(res) in (int,float):
+                print(f'Timeout setted to {int(res//60)}:{int(res%60)}')
+            else:
+                print('Error to read timeout')
+        else:
+            if time == 'no_time':
+                attack_ctrl['timeout'] = None
+                print('Timeout disabilited! using global timeout')
+            else:
+                try:time = int(time)
+                except:
+                    try:time = float(time)
+                    except:pass
+                if type(time) in (int,float):
+                    attack_ctrl['timeout'] = time
+                    print(f'Timeout changed to {int(time//60)}:{int(time%60)}')
+    except:
+        print(f'Process controller of {attack_name} attack not founded!')
+
+def on_off_status_autoblacklist(attack_name,ip,on_or_off = None):
+    blacklist_status = None
+    try:
+        blacklist_status = glob.settings['blacklist'][attack_name][ip]
+    except:
+        print('No auto_blacklist status founded!')
+        return
+    try:
+        if on_or_off is None:
+            print(f'Autoblacklist {bool_onoff(blacklist_status["excluded"])} for {attack_name}')
+            print(f'Times execution failed sequently {blacklist_status["fail_times"]}')
+            print(f'Times the process was blocked by autoblacklist sequently {blacklist_status["stopped_times"]}')
+        else:
+            if bool_onoff(on_or_off):
+                blacklist_status['excluded'] = True
+            else:
+                blacklist_status['excluded'] = False
+                blacklist_status['fail_times'] = 0
+            print('Status Updated')
+    except:
+        print('Error reading autoblacklist settings')
 
 
 class CTFsubShell(cmd.Cmd):
@@ -249,17 +299,19 @@ class CTFsubShell(cmd.Cmd):
                 },
                 'status':[print], # Full status so will be builded at the end of the process command
                 'timeout':{
-                    'disable':[print],
+                    'disable':[get_set_timeout,('no_time',)],
                     'set':{
-                        'num::time_in_seconds':[print]
+                        'num::time_in_seconds':[get_set_timeout]
                         }, 
-                    'status':[print]
+                    'status':[get_set_timeout]
                 },
                 'autoblacklist':{
-                    'set':{
-                        'onoff::on_or_off':[print]
-                    }, 
-                    'status':[print] 
+                    'ip::':{
+                        'set':{
+                            'onoff::on_or_off':[on_off_status_autoblacklist]
+                        }, 
+                        'status':[on_off_status_autoblacklist] 
+                    }
                 },
                 'alive-ctrl':{
                     'on':{
