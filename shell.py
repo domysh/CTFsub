@@ -12,7 +12,37 @@ class glob:
         exit(1)
 
 def getParamethers(line):
-    return [f for f in line.split(' ') if f != '']
+    #if '"' not in line:
+    #    return [f for f in line.split(' ') if f != '']
+    res = []
+    in_str_mode = False
+    last_back = False
+    buff = ''
+    for lett in line:
+        if last_back:
+            buff += lett
+            last_back = False
+        elif lett == '\\':
+            last_back = True
+        elif lett == ' ' and not in_str_mode:
+            if buff != '':
+                res.append(buff)
+                buff = ''
+        elif lett == '"' and buff == '' and not in_str_mode:
+            in_str_mode = True
+        elif lett == '"' and in_str_mode:
+            in_str_mode = False
+            res.append(buff)
+            buff = ''
+        else:
+            buff+=lett
+    if in_str_mode:
+        raise InvalidCommand('no ending \'"\'')
+    if buff != '':res.append(buff)
+    return res            
+
+
+
 
 def list_process_array():
     return [f for f in utils.fun.get_pythonfile_list(utils.config.ATTACKS_FOLDER) if f != '__init__']
@@ -400,10 +430,12 @@ class CTFsubShell(cmd.Cmd):
         "Exit from CTFsub command line"
         exit()
 
+class InvalidCommand(Exception):pass
 
 if __name__ == '__main__':
     shell = CTFsubShell()
     while True:
         try:shell.cmdloop()
         except (KeyboardInterrupt,InterruptedError):print()
+        except (InvalidCommand):print('Invalid command D:')
 
