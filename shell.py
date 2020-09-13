@@ -3,8 +3,6 @@ import cmd, utils
 from utils.syjson import SyJson
 from utils.config import GLOBAL_SETTINGS_FILE, GLOBAL_DATA_FILE
 
-
-
 class glob:
     try:
         g_var = SyJson(GLOBAL_DATA_FILE, create_file=False)
@@ -80,10 +78,7 @@ def enable_process(attack_name,set_to=None):
     except:
         print(f'Process controller of {attack_name} attack not founded!')
 
-def filter_get_set(what_list,attack_name,*ips):
-    assert(what_list == 'excluded' or what_list == 'whitelist')
-    enabled_on = True
-    if what_list == 'excluded': enabled_on = False
+def whitelist_get_set(attack_name,*ips):
     attack_ctrl = None 
     try:
         attack_ctrl = glob.settings['process_controller'][attack_name]
@@ -93,25 +88,50 @@ def filter_get_set(what_list,attack_name,*ips):
     try:
         status = attack_ctrl['whitelist_on']
         if len(ips) == 0:
-            if status != enabled_on:
-                print(f'ALLERT! The {what_list} is disabilited')
-            print(f'{what_list} for {attack_name} attack is =',attack_ctrl[f'{what_list}_ip'])
+            if status != True:
+                print('ALLERT! The whitelist is disabilited')
+            print(f'Whitelist for {attack_name} attack is =',attack_ctrl['whitelist_ip'])
         else:
-            
-            attack_ctrl[f'{what_list}_ip'] = []
+            attack_ctrl['whitelist_ip'] = []
             if ips[0] != 'no_ip':
                 for ip in ips:
                     if not utils.fun.is_valid_ip(ip):
                         print(f'{ip} is not a valid IP address!')
                         return 
-                    attack_ctrl[f'{what_list}_ip'].append(ip)
-            attack_ctrl['whitelist_on'] = enabled_on
+                    attack_ctrl['whitelist_ip'].append(ip)
+            attack_ctrl['whitelist_on'] = True
+            print('All done :D')
+    except:
+        print(f'Process Controller of {attack_name} damaged !!!')
+
+def blacklist_get_set(attack_name,*ips):
+    attack_ctrl = None 
+    try:
+        attack_ctrl = glob.settings['process_controller'][attack_name]
+    except:
+        print(f'Process Controller not found for {attack_name}')
+        return 
+    try:
+        status = attack_ctrl['whitelist_on']
+        if len(ips) == 0:
+            if status != False:
+                print(f'ALLERT! The blacklist is disabilited')
+            print(f'Blacklist for {attack_name} attack is =',attack_ctrl['excluded_ip'])
+        else:
+            attack_ctrl['excluded_ip'] = []
+            if ips[0] != 'no_ip':
+                for ip in ips:
+                    if not utils.fun.is_valid_ip(ip):
+                        print(f'{ip} is not a valid IP address!')
+                        return 
+                    attack_ctrl['excluded_ip'].append(ip)
+            attack_ctrl['whitelist_on'] = False
             print('All done :D')
     except:
         print(f'Process Controller of {attack_name} damaged !!!')
             
 def disable_filters(attack_name):
-    return filter_get_set('excluded',attack_name,'no_ip') 
+    return blacklist_get_set(attack_name,'no_ip') 
 
 def get_filter_status(attack_name):
     attack_ctrl = None 
@@ -133,6 +153,8 @@ def get_filter_status(attack_name):
                 print(f'Here the IPs blacklisted: {array_ip}') 
     except:
         print(f'Process controller of {attack_name} attack not founded!')
+
+
 
 class CTFsubShell(cmd.Cmd):
 
@@ -184,12 +206,12 @@ class CTFsubShell(cmd.Cmd):
                 },
                 'filter':{
                     'whitelist':{
-                        'set':{'ip_array::list_all_ip':[filter_get_set,('whitelist',)]},
-                        'get':[filter_get_set,('whitelist',)]
+                        'set':{'ip_array::list_all_ip':[whitelist_get_set]},
+                        'get':[whitelist_get_set]
                     },
                     'blacklist':{
-                        'set':{'ip_array::list_all_ip':[filter_get_set,('excluded',)]},
-                        'get':[filter_get_set,('excluded',)]
+                        'set':{'ip_array::list_all_ip':[blacklist_get_set]},
+                        'get':[blacklist_get_set]
                     },
                     'disable':[disable_filters],
                     'status':[get_filter_status]
@@ -274,6 +296,22 @@ class CTFsubShell(cmd.Cmd):
         'log_name':lambda: ['@global','@all','@flag'] + list_process_array(),
         }
     
+
+    #Can modify the command excluing the code under this
+    def __init__(self):
+        super().__init__()
+        self.__command_factory_init(self.routes.keys(),self.completeall,self.docommand)
+    
+    def __gen_do_fun(self,do_fun,command_name):
+        return lambda self,a: do_fun(a,command_name)
+
+    def __command_factory_init(self,command_list,hint_fun,do_fun):
+        class_obj = self.__class__
+        for command in command_list:
+            setattr(class_obj,f'complete_{command}',hint_fun)
+            fun = self.__gen_do_fun(do_fun,command)
+            setattr(class_obj,f'do_{command}',fun)
+
     def get_full_hint(self,h_list,text):
         res = []
         for ele in h_list:
@@ -357,24 +395,15 @@ class CTFsubShell(cmd.Cmd):
                     return self.get_full_hint(list(hint_list.keys()),text)
             else:
                 return []
-             
-    complete_process = complete_config = \
-    complete_log = complete_attack = completeall
-
-    def do_process(self,a): return self.docommand(a,'process')
-    def do_config(self,a): return self.docommand(a,'config')
-    def do_log(self,a): return self.docommand(a,'log')
-    def do_attack(self,a): return self.docommand(a,'attack')
-
+    
     def do_exit(self,line):
         "Exit from CTFsub command line"
         exit()
+
 
 if __name__ == '__main__':
     shell = CTFsubShell()
     while True:
         try:shell.cmdloop()
         except (KeyboardInterrupt,InterruptedError):print()
-
-
 
