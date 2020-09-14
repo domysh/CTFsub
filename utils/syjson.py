@@ -113,6 +113,9 @@ class InnerIterObject(SyJsonObj):
         val = self.var() 
         val[key] = value
         self.sync(val)
+    
+    def __len__(self):
+        return self.var().__len__()
 
 class SyncedList(InnerIterObject):
     def __init__(self,root:SyJsonObj,key):

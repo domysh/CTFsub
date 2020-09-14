@@ -175,9 +175,9 @@ def get_filter_status(attack_name):
     try:
         if attack_ctrl['whitelist_on']:
             print('Now is active the Whitelist')
-            print(f'Here the IPs whitelisted: {attack_ctrl[f"whitelist_ip"]}') 
+            print(f'Here the IPs whitelisted: {attack_ctrl["whitelist_ip"]}') 
         else:
-            array_ip = attack_ctrl[f"excluded_ip"]
+            array_ip = attack_ctrl["excluded_ip"]
             if len(array_ip) == 0:
                 print('Filters are disabilited!')
             else:
@@ -234,6 +234,46 @@ def on_off_status_autoblacklist(attack_name,ip,on_or_off = None):
             print('Status Updated')
     except:
         print('Error reading autoblacklist settings')
+
+def on_off_status_alivectrl(attack_name,port = None):
+    attack_ctrl = get_process_controller(attack_name)
+    if attack_ctrl is None: return
+    try:
+        if port is None:
+            res = attack_ctrl['alive_ctrl']
+            if res is None:
+                print('Attack Active Control is disabilited')
+            else:
+                print(f'Port setted for Active Control is {res}')
+        else:
+            if port == 'disable':
+                attack_ctrl['alive_ctrl'] = None
+                print('Attack Active Control have been disabilited for this attack')
+            else:
+                try:
+                    port = int(port)
+                    if port > 65535  or port < 1:raise Exception()
+                    attack_ctrl['alive_ctrl'] = port
+                    print('Active Control for attack setted correctly on the port indicated')
+                except:
+                    print('Invalid port')
+    except:
+        print('Error reading autoblacklist settings')
+
+def get_attack_status(attack_name):
+    print_div()
+    attack_ctrl = get_process_controller(attack_name)
+    if attack_ctrl is None: return
+    print(f'Name of the attack: {attack_name}')
+    print_div()
+    enable_process(attack_name)
+    print('FILTERS:')
+    get_filter_status(attack_name)
+    print('TIMEOUT:')
+    get_set_timeout(attack_name)
+    print('ACTIVE CONTROL:')
+    on_off_status_alivectrl(attack_name)
+    print_div()
 
 
 class CTFsubShell(cmd.Cmd):
@@ -297,7 +337,7 @@ class CTFsubShell(cmd.Cmd):
                     'status':[get_filter_status]
 
                 },
-                'status':[print], # Full status so will be builded at the end of the process command
+                'status':[get_attack_status], # Full status so will be builded at the end of the process command
                 'timeout':{
                     'disable':[get_set_timeout,('no_time',)],
                     'set':{
@@ -315,10 +355,10 @@ class CTFsubShell(cmd.Cmd):
                 },
                 'alive-ctrl':{
                     'on':{
-                        'intnum::port':[print] 
+                        'intnum::port':[on_off_status_alivectrl] 
                     },
-                    'off':[print], 
-                    'status':[print] 
+                    'off':[on_off_status_alivectrl,('disable',)], 
+                    'status':[on_off_status_alivectrl] 
                 }
 
             }
@@ -421,7 +461,7 @@ class CTFsubShell(cmd.Cmd):
                 if params:
                     c_vars += params
                 if len(hint_list) == 2:
-                    return hint_list[0](*hint_list[1],*c_vars)
+                    return hint_list[0](*c_vars,*hint_list[1])
                 elif len(hint_list) == 1:
                     return hint_list[0](*c_vars)
                 else:
