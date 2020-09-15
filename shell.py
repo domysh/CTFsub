@@ -2,6 +2,7 @@
 import cmd, utils
 from utils.syjson import SyJson
 from utils.config import GLOBAL_SETTINGS_FILE, GLOBAL_DATA_FILE
+from utils.tail import Tail
 
 class glob:
     try:
@@ -275,6 +276,13 @@ def get_attack_status(attack_name):
     on_off_status_alivectrl(attack_name)
     print_div()
 
+def tail_log(log_name):
+    if log_name == '@global':
+        Tail(utils.config.GLOBAL_LOG_FILE).follow(10,0.3)
+    elif log_name == '@flag':
+        Tail(utils.config.GLOBAL_FLAG_FILE).follow(10,0.3)
+    else:
+        print('Not valid log name')
 
 class CTFsubShell(cmd.Cmd):
 
@@ -363,7 +371,7 @@ class CTFsubShell(cmd.Cmd):
 
             }
         },
-        'config':{
+        'config':{    #TODO !!!!!!!!!!!!!!!!!!
             'list': [print], 
             'get':{
                 'config_name::':[print] 
@@ -375,20 +383,7 @@ class CTFsubShell(cmd.Cmd):
             }
         },
         'log':{
-            'print':{
-                'intnum::num_of_lines':{
-                    'log_name::':[print]
-                },
-                'all':{
-                    'log_name::':[print]
-                }
-            },
-            'reset':{
-                'log_name::':[print]
-            },
-            'watch':{
-                'log_name::':[print]
-            }
+            'log_name::':[tail_log]
         },
         'attack':{
             'async':{
@@ -415,7 +410,7 @@ class CTFsubShell(cmd.Cmd):
         'config_name':['FLAG_REGEX','IP_VM_TEMP','TEAM_IP_RANGE','OUR_TEAM_ID',
                     'TICK_TIME','SEC_SECONDS','TIMEOUT_ATTACK','THREADING_LIMIT',
                     'AUTO_BLACKLIST_ON','TIMES_TO_BLACKLIST','TIME_TO_WAIT_IN_BLACKLIST'],
-        'log_name':lambda: ['@global','@all','@flag'] + list_process_array(),
+        'log_name':['@global','@flag'],
         }
     
 

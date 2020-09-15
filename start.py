@@ -151,9 +151,9 @@ def start_attack(py_attack,assigned_ip):
         log.error(f'An unexpected result recived on {assigned_ip} using {py_attack} attack... continuing')
         log.exception(e)
 
-def main():
+def main(infinite=True):
     log.info('CTFsub is starting !')
-    while True:
+    while infinite:
         #Wait for find python attack files
         wait_for_attacks = False
         #Remove Pycache
@@ -298,17 +298,18 @@ def main():
         del thread_list
         log.info(f'Attacks for this round finished')
 
-        #Wait remaing time
-        this_time = time.time()
-        time_to_wait = utils.config.TICK_TIME - (this_time - last_time)
-        if time_to_wait > 0:
-            log.info(f'{int(time_to_wait//60)} minutes and {int(time_to_wait)%60} seconds for new round')
-            sleep(time_to_wait) # Wait for the round
-            
-        # Adding SEC_SECONDS seconds for security
-        for i in reversed(range(1,utils.config.SEC_SECONDS+1)):
-            log.warning(f'{i} second for starting new round')
-            sleep(1)
+        if not infinite:
+            #Wait remaing time
+            this_time = time.time()
+            time_to_wait = utils.config.TICK_TIME - (this_time - last_time)
+            if time_to_wait > 0:
+                log.info(f'{int(time_to_wait//60)} minutes and {int(time_to_wait)%60} seconds for new round')
+                sleep(time_to_wait) # Wait for the round
+                
+            # Adding SEC_SECONDS seconds for security
+            for i in reversed(range(1,utils.config.SEC_SECONDS+1)):
+                log.warning(f'{i} second for starting new round')
+                sleep(1)
 
 
 if __name__ == '__main__':
