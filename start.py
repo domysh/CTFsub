@@ -1,3 +1,12 @@
+'''
+CTFsub(mitter) for A/D CTF
+
+Author DomySh (Domingo Dirutigliano)
+Contact domingo.dirutigliano@domysh.com
+Website domysh.com
+
+'''
+
 import requests, os, logging, re, json
 import multiprocessing, time, threading
 import importlib
