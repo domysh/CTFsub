@@ -1,16 +1,22 @@
 #!/usr/bin/python3
-import cmd, utils, time
+import cmd, utils, time, os, subprocess
 from utils.syjson import SyJson
 from utils.config import GLOBAL_SETTINGS_FILE, GLOBAL_DATA_FILE
 from utils.tail import Tail
 
+NOT_STARTED = False
 class glob:
     try:
         g_var = SyJson(GLOBAL_DATA_FILE, create_file=False)
         settings = SyJson(GLOBAL_SETTINGS_FILE, create_file=False)
     except:
-        print(('-'*30)+'\nBefore you run the shell,\nyou have to run CTFsub\n'+('-'*30))
-        exit(1)
+        NOT_STARTED = True
+
+def not_started():
+    print(('-'*30)+'\nBefore you run the shell,\nyou have to run CTFsub\n'+('-'*30))
+    if yes_or_no('Do you want to execute CTFsub?'):
+        run_command()
+    else: exit(1)
 
 def getParamethers(line):
     #if '"' not in line:
@@ -313,18 +319,22 @@ def close_req():
     if req is None:return
     req['wait_for'] = None
 
-def force_delete_req():
-
+def yes_or_no(s:str=''):
     while True:
-        resp = input('Are you sure to delete request force? (y/n): ')
+        resp = input(f'{s} (y/n): ')
         if len(resp)>0:
             if resp[0].upper() == 'Y':
-                break
+                return True
             elif resp[0].upper() == 'N':
-                print('Skipping operation...')
-                return 
+                return False
         print('Send y or n')
 
+def force_delete_req():
+
+    if not yes_or_no('Are you sure to delete request force?'):
+        print('Skipping operation...')
+        return 
+    
     glob.settings['shell_req'] = {}
     print('Request deleted enforced')
 
@@ -388,19 +398,37 @@ def list_config():
     for i in range(len(names)):
         print(f'{names[i]} = {values[i]}')
     close_req()
-'''
-{
 
-#Shell Commands
+def run_command():
+    if os.path.exists('run.sh'):
+        proc = subprocess.Popen(['/bin/sh','run.sh'],stdout=subprocess.DEVNULL)
+        if proc.wait() != 0:
+            print('Error Executing run.sh')
+            exit(1)
+        else:
+            glob.g_var = SyJson(GLOBAL_DATA_FILE, create_file=False)
+            glob.settings = SyJson(GLOBAL_SETTINGS_FILE, create_file=False)
+    else:
+        print('Impossible find run.sh Exiting...')
+        exit(1)
 
-"shell_req":{
-        "wait_for":"sub/shell/None" None = Delete
-        "id_req":"code_of_request"
-        ["...":"..."]
-    }
+def stop_command(exit_end = True):
+    if os.path.exists('stop.sh'):
+        proc = subprocess.Popen(['/bin/sh','stop.sh'],stdout=subprocess.DEVNULL)
+        if proc.wait() != 0:
+            print('Error Executing stop.sh')
+            exit(1)
+        if exit_end:
+            print('Exiting form shell...')
+            exit(0)
+    else:
+        print('stop.sh not found... exiting...')
+        exit(1)
 
-}
-'''
+def restart_command():
+    stop_command(False)
+    run_command()
+    
 
 class CTFsubShell(cmd.Cmd):
 
@@ -507,7 +535,9 @@ class CTFsubShell(cmd.Cmd):
             'break-wait-time':[create_simple_shell_req,('break-wait-time',)],
             'stop-attacks':[create_simple_shell_req,('stop-attacks',)],
             'force-remove-req':[force_delete_req]
-        }
+        },
+        'stop':[stop_command],
+        'restart':[restart_command]
 
     }
 
@@ -625,6 +655,7 @@ class CTFsubShell(cmd.Cmd):
 class InvalidCommand(Exception):pass
 
 if __name__ == '__main__':
+    if not os.path.exists('stop.sh') or NOT_STARTED: not_started()
     shell = CTFsubShell()
     while True:
         try:shell.cmdloop()

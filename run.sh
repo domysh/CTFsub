@@ -4,7 +4,7 @@ echo "Starting CTFsub process!"
 if test -f "stop.sh"; then
     echo "The program is running!"
     echo "Close first it running ./stop.sh"
-    exit
+    exit 1
 fi
 echo "run stop.sh for kill the process"
 echo "the file 'stop.sh' will be removed after his execution"
