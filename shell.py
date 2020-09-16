@@ -284,25 +284,34 @@ def tail_log(log_name):
     else:
         print('Not valid log name')
 
-def get_shell_req():
+def get_shell_req(print_msg=True):
     try:
         if 'shell_req' not in glob.settings.keys():
             glob.settings['shell_req'] = {}
         dots = ''
         while True:
             if 'wait_for' in glob.settings['shell_req'].keys():
+                if glob.settings['shell_req']['wait_for'] == 'shell':break
+                
                 if len(dots) > 3:
                     dots = ''
-                print(f'\rWaiting for response from a shell request{dots}{" "*(3-len(dots))} [',end='')
+                if print_msg:
+                    print(f'\rWaiting for response from shell request{dots}{" "*(3-len(dots))} [',end='')
                 time.sleep(1)
                 dots+='.'
-            else:
-                print('',end='\n'+('-'*30)+'\n')
-                break
+            else:break
+        if print_msg:
+            print()
         time.sleep(0.5)
         return glob.settings['shell_req']
     except:
-        print('Failed to get request')
+        if print_msg:
+            print('Failed to get request')
+
+def close_req():
+    req = get_shell_req(False)
+    if req is None:return
+    req['wait_for'] = None
 
 def force_delete_req():
 
@@ -325,6 +334,60 @@ def create_simple_shell_req(req_code):
     if req is None:return
     req.sync({'wait_for':'sub','id_req':req_code})
     print('Request submitted!')
+
+def get_config(config_name):
+    req = get_shell_req()
+    if req is None:return
+    req.sync({
+        'wait_for':'sub',
+        'id_req':'config',
+        'operation_type':'get',
+        'target_key':config_name
+        })
+    req = get_shell_req()
+    if req is None:return
+    print(f'RESPONSE: {config_name} = {req["response_value"]}')
+    close_req()
+
+def set_config(config_name,value):
+    try:value = int(value)
+    except:
+        try:value = float(value)
+        except:pass
+    if type(value) not in (int,float):
+        if value == "True":
+            value = True
+        elif value == "False":
+            value = False
+        elif value == "None":
+            value = None
+    req = get_shell_req()
+    if req is None:return
+    req.sync({
+        'wait_for':'sub',
+        'id_req':'config',
+        'operation_type':'set',
+        'target_key':config_name,
+        'target_value':value
+    })
+    print('Set config request sended !')    
+
+def list_config():
+    req = get_shell_req()
+    if req is None:return
+    req.sync({
+        'wait_for':'sub',
+        'id_req':'config',
+        'operation_type':'list'
+    })
+    req = get_shell_req()
+    if req is None:return
+    names = req['response_names']
+    values = req['response_values']
+    print(f'RESPONSE: vars = {len(names)}')
+    for i in range(len(names)):
+        print(f'{names[i]} = {values[i]}')
+    close_req()
 '''
 {
 
@@ -400,7 +463,7 @@ class CTFsubShell(cmd.Cmd):
                     'status':[get_filter_status]
 
                 },
-                'status':[get_attack_status], # Full status so will be builded at the end of the process command
+                'status':[get_attack_status],
                 'timeout':{
                     'disable':[get_set_timeout,('no_time',)],
                     'set':{
@@ -426,14 +489,14 @@ class CTFsubShell(cmd.Cmd):
 
             }
         },
-        'config':{    #TODO !!!!!!!!!!!!!!!!!!
-            'list': [print], 
+        'config':{    
+            'list': [list_config],
             'get':{
-                'config_name::':[print] 
+                'config_name::':[get_config] 
             },
             'set':{
                 'config_name::':{
-                    'val::value_to_set':[print] 
+                    'val::value_to_set':[set_config] 
                 }
             }
         },

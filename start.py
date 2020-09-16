@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''
 
 CTFsub(mitter) for CTF A/D
@@ -63,12 +64,12 @@ def shell_request_manage():
                         if shell_reqest_dispatcher(req['id_req'],req):
                             req['wait_for'] = 'shell'
                         else:
-                            req = {} 
+                            glob.settings['shell_req'] = {}
                     except Exception as e:
                         log.error('Failed to execute shell requests')
                         log.exception(e)
                 elif req['wait_for'] is None:
-                    req = {}
+                    glob.settings['shell_req'] = {}
 
     except Exception as e:
         log.error('Failed to read shell requests')
@@ -83,22 +84,39 @@ def shell_reqest_dispatcher(action,req_dict):
         if not glob.break_round_attacks:
             log.info('Requested from shell to stop attacks for this round')
             glob.break_round_attacks = True
-    elif action == 'set-config':
-        pass
-    elif action == 'get-config':
-        return True
+    elif action == 'config':
+        if req_dict['operation_type'] == 'get':
+            config_name = req_dict['target_key']
+            if config_name in utils.config.SHELL_CAN_USE:
+                req_dict['response_value'] = getattr(utils.config, config_name)
+                return True
+        elif req_dict['operation_type'] == 'set':
+            config_name = req_dict['target_key']
+            if config_name in utils.config.SHELL_CAN_USE:
+                setattr(utils.config, config_name, req_dict['target_value'])
+                log.info(f'utils.config.{config_name} assigned to {req_dict["target_value"]}')
+        elif req_dict['operation_type'] == 'list':
+            names = utils.config.SHELL_CAN_USE
+            values = []
+            for name in names:
+                values.append(getattr(utils.config, name))
+            req_dict['response_values'] = values
+            req_dict['response_names'] = names
+            return True
+
     else:
         log.info('Unrecognised shell request... skipping')
+    return None
 
 #Thread function that have to execute a function
-def start_attack(py_attack,assigned_ip):
+def start_attack(py_attack, assigned_ip):
     #Starting the attack...
     try:
         #Import the file and importing an Istance of the Attack Class
         this_attack = get_attack_by_name(py_attack).ATTACK
         this_attack.attack_name = utils.fun.min_name(py_attack)
         #Verify that is the sub class wanted
-        if not isinstance(this_attack,utils.classes.AttackModel):
+        if not isinstance(this_attack, utils.classes.AttackModel):
             log.error(f'{py_attack} file havent a Attack Class that is subclass of AttackModel... Skipping attack...')
             return
         #Get the flag and submit
