@@ -66,7 +66,10 @@ def shell_request_manage():
                             req = {} 
                     except Exception as e:
                         log.error('Failed to execute shell requests')
-                        log.exception(e)     
+                        log.exception(e)
+                if req['wait_for'] is None:
+                    req = {}
+
     except Exception as e:
         log.error('Failed to read shell requests')
         log.exception(e)
