@@ -2,11 +2,19 @@ import threading, os, json
 
 class SyJsonObj:
     def __init__(self):
+        #For delete stange error on pylint
+        self.request_lock = None 
         raise Exception('Abstract Class')
-    
+
     def __getitem__(self,key):
         raise Exception('Abstract Class')
-    
+
+    def _read(self):
+        raise Exception('Abstract Class')
+
+    def _write(self,var):
+        raise Exception('Abstract Class')
+
     def var(self):
         self.request_lock.acquire()
         try:
@@ -20,19 +28,12 @@ class SyJsonObj:
             return self._write(var)
         finally:
             self.request_lock.release()
-
-    def _read(self):
-        raise Exception('Abstract Class')
-
-    def _write(self):
-        raise Exception('Abstract Class')
-
     
     def _get_synced_item(self,key,v):
         if type(v) in (list,tuple):
-            return SyncedList(self,key)
+            v = SyncedList(self,key)
         elif type(v) in (dict,):
-            return SyncedDict(self,key)
+            v = SyncedDict(self,key)
         return v
 
     def _get_desynced_item(self,v):
@@ -132,6 +133,9 @@ class SyncedList(InnerIterObject):
         val = self.var()
         del val[name]
         self.sync(val)
+    
+    def __iter__(self):
+        return self.var().__iter__()
 
     def pop(self,num=-1):
         val = self.var()

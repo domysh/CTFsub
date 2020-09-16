@@ -277,12 +277,29 @@ def get_attack_status(attack_name):
     print_div()
 
 def tail_log(log_name):
-    if log_name == '@global':
+    if log_name == 'global':
         Tail(utils.config.GLOBAL_LOG_FILE).follow(10,0.3)
-    elif log_name == '@flag':
+    elif log_name == 'flag':
         Tail(utils.config.GLOBAL_FLAG_FILE).follow(10,0.3)
     else:
         print('Not valid log name')
+
+'''
+{
+
+#Shell Commands
+
+"shell_req":[
+    {
+        "wait_for":"sub/shell/None" None = Delete
+        "id_req":"code_of_request"
+        ["...":"..."]
+    },
+    {...}
+]
+
+}
+'''
 
 class CTFsubShell(cmd.Cmd):
 
@@ -385,20 +402,9 @@ class CTFsubShell(cmd.Cmd):
         'log':{
             'log_name::':[tail_log]
         },
-        'attack':{
-            'async':{
-                'run':{
-                    'attack_name::':{
-                            'ip::':[print],
-                            'all':[print]
-                        }
-                },
-                'stop':[print]
-            },
-            'sync':{
-                'stop':[print],
-                'start':[print]
-            }
+        'loop-command':{
+            'break-wait-time':[print],
+            'stop-attacks':[print]
         }
 
     }
@@ -407,10 +413,8 @@ class CTFsubShell(cmd.Cmd):
 
     hint_vars = {
         'attack_name':list_process_array,
-        'config_name':['FLAG_REGEX','IP_VM_TEMP','TEAM_IP_RANGE','OUR_TEAM_ID',
-                    'TICK_TIME','SEC_SECONDS','TIMEOUT_ATTACK','THREADING_LIMIT',
-                    'AUTO_BLACKLIST_ON','TIMES_TO_BLACKLIST','TIME_TO_WAIT_IN_BLACKLIST'],
-        'log_name':['@global','@flag'],
+        'config_name':utils.config.SHELL_CAN_USE,
+        'log_name':['global','flag'],
         }
     
 
