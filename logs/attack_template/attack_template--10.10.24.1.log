@@ -1,0 +1,54 @@
+2020-09-16 12:25:10,322 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:25:10,322 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 0
+2020-09-16 12:25:10,323 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:25:13,525 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:25:13,526 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 1
+2020-09-16 12:25:13,526 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:26:46,762 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:26:46,763 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 2
+2020-09-16 12:26:46,763 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:28:19,913 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:28:19,913 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 3
+2020-09-16 12:28:19,913 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:29:15,958 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:29:15,959 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 4
+2020-09-16 12:29:15,960 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:29:36,267 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:29:36,268 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 5
+2020-09-16 12:29:36,268 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:31:02,511 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:31:02,511 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 6
+2020-09-16 12:31:02,512 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:31:22,037 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:31:22,038 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 7
+2020-09-16 12:31:22,038 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:32:55,216 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:32:55,217 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 8
+2020-09-16 12:32:55,217 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:34:28,398 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:34:28,399 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 9
+2020-09-16 12:34:28,399 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:36:01,587 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:36:01,588 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 10
+2020-09-16 12:36:01,588 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:37:34,672 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:37:34,672 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 11
+2020-09-16 12:37:34,672 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:39:08,041 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:39:08,042 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 12
+2020-09-16 12:39:08,042 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:40:41,254 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:40:41,255 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 13
+2020-09-16 12:40:41,255 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:42:14,208 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:42:14,208 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 14
+2020-09-16 12:42:14,208 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:43:47,552 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:43:47,552 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 15
+2020-09-16 12:43:47,552 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:45:20,571 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:45:20,571 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 16
+2020-09-16 12:45:20,572 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK
+2020-09-16 12:46:53,717 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: STARTING ATTACK
+2020-09-16 12:46:53,717 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: Success! Test g_var status: 17
+2020-09-16 12:46:53,718 * 10.10.24.1 * attack_template - 10.10.24.1 - INFO: END ATTACK

@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-import cmd, utils
+import cmd, utils, time
 from utils.syjson import SyJson
 from utils.config import GLOBAL_SETTINGS_FILE, GLOBAL_DATA_FILE
 from utils.tail import Tail
@@ -284,19 +284,57 @@ def tail_log(log_name):
     else:
         print('Not valid log name')
 
+def get_shell_req():
+    try:
+        if 'shell_req' not in glob.settings.keys():
+            glob.settings['shell_req'] = {}
+        dots = ''
+        while True:
+            if 'wait_for' in glob.settings['shell_req'].keys():
+                if len(dots) > 3:
+                    dots = ''
+                print(f'\rWaiting for response from a shell request{dots}{" "*(3-len(dots))} [',end='')
+                time.sleep(1)
+                dots+='.'
+            else:
+                print('',end='\n'+('-'*30)+'\n')
+                break
+        time.sleep(0.5)
+        return glob.settings['shell_req']
+    except:
+        print('Failed to get request')
+
+def force_delete_req():
+
+    while True:
+        resp = input('Are you sure to delete request force? (y/n): ')
+        if len(resp)>0:
+            if resp[0].upper() == 'Y':
+                break
+            elif resp[0].upper() == 'N':
+                print('Skipping operation...')
+                return 
+        print('Send y or n')
+
+    glob.settings['shell_req'] = {}
+    print('Request deleted enforced')
+
+
+def create_simple_shell_req(req_code):
+    req = get_shell_req()
+    if req is None:return
+    req.sync({'wait_for':'sub','id_req':req_code})
+    print('Request submitted!')
 '''
 {
 
 #Shell Commands
 
-"shell_req":[
-    {
+"shell_req":{
         "wait_for":"sub/shell/None" None = Delete
         "id_req":"code_of_request"
         ["...":"..."]
-    },
-    {...}
-]
+    }
 
 }
 '''
@@ -402,20 +440,20 @@ class CTFsubShell(cmd.Cmd):
         'log':{
             'log_name::':[tail_log]
         },
-        'loop-command':{
-            'break-wait-time':[print],
-            'stop-attacks':[print]
+        'shellreq':{
+            'break-wait-time':[create_simple_shell_req,('break-wait-time',)],
+            'stop-attacks':[create_simple_shell_req,('stop-attacks',)],
+            'force-remove-req':[force_delete_req]
         }
 
     }
-
 
 
     hint_vars = {
         'attack_name':list_process_array,
         'config_name':utils.config.SHELL_CAN_USE,
         'log_name':['global','flag'],
-        }
+    }
     
 
     #Can modify the command excluing the code under this

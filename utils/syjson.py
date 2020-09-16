@@ -133,9 +133,6 @@ class SyncedList(InnerIterObject):
         val = self.var()
         del val[name]
         self.sync(val)
-    
-    def __iter__(self):
-        return self.var().__iter__()
 
     def pop(self,num=-1):
         val = self.var()

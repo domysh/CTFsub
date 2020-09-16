@@ -56,24 +56,37 @@ def get_attack_by_name(attack_name,cache_use = False):
 def shell_request_manage():
     try:
         if 'shell_req' in glob.settings.keys():
-            ind = 0
-            for req in glob.settings['shell_req']:
+            req = glob.settings['shell_req']
+            if 'wait_for' in req.keys():
                 if req['wait_for'] == 'sub':
                     try:
-                        req.sync( shell_reqest_dispacher(req['id_req'],req.var()) )
+                        if shell_reqest_dispatcher(req['id_req'],req):
+                            req['wait_for'] = 'shell'
+                        else:
+                            req = {} 
                     except Exception as e:
                         log.error('Failed to execute shell requests')
-                        log.exception(e)
-                elif req['wait_for'] is None:
-                    glob.settings['shell_req'].pop(ind)
-                    ind-=1
-                ind+=1          
+                        log.exception(e)     
     except Exception as e:
         log.error('Failed to read shell requests')
         log.exception(e)
 
-def shell_reqest_dispacher(action,req_dict):
-    return req_dict
+def shell_reqest_dispatcher(action,req_dict):
+    if action == 'break-wait-time':
+        if not glob.break_wait_time:
+            log.info('Requested from shell to skip wait time for this round')
+            glob.break_wait_time = True
+    elif action == 'stop-attacks':
+        if not glob.break_round_attacks:
+            log.info('Requested from shell to stop attacks for this round')
+            glob.break_round_attacks = True
+    elif action == 'set-config':
+        pass
+    elif action == 'get-config':
+        return True
+    else:
+        log.info('Unrecognised shell request... skipping')
+
 #Thread function that have to execute a function
 def start_attack(py_attack,assigned_ip):
     #Starting the attack...
