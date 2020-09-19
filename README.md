@@ -28,21 +28,7 @@ Program your attack using python template attack_template.py, you can run it in 
 # TODO list
 
 <ol>
-<li>Create a shell for run time functions and mods: Functions of the shell
-  <ol>
-    <li>Modify auto_blacklist status (reset or block a ip on an attack)</li>
-    <li>Modify config vars like the global timeout, or the thread limit etc...</li>
-    <li>Manage attacks
-      <ol>
-        <li>Create whitelist/blacklist of ip,</li>
-        <li>Start or stop a specific attack script,</li>
-        <li>Start a control for an alive service for an attack,</li>
-        <li>Run an attack at one ip or at all ip without following round time,</li>
-        <li>block or start rounds (bypassing of blocking timing)</li>
-      </ol>
-    </li>
-  </ol>
-
+<li>Debug all functionalities and relase a version</li>
 <li>Create a web endpoint to easily submit (also with a simply get request) flags form external scripts (for example with JS)</li>
 
 </ol>

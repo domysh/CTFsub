@@ -7,12 +7,7 @@ IP_ADDRESS_DEBUG = "10.10.1.1"
 
 # 'main' function
 def run(ip,log,g_var):
-    from time import sleep
-    from random import randint as rnd
-
     g_var_set(g_var,'count',0)
-
-    sleep(rnd(2,6)) #Simulating work
     
     log.info(f"Success! Test g_var status: {g_var['count']}")
     g_var['count'] +=1
