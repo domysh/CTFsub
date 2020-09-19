@@ -406,8 +406,8 @@ def run_command():
             print('Error Executing run.sh')
             exit(1)
         else:
-            glob.g_var = SyJson(GLOBAL_DATA_FILE, create_file=False)
-            glob.settings = SyJson(GLOBAL_SETTINGS_FILE, create_file=False)
+            glob.g_var = SyJson(GLOBAL_DATA_FILE)
+            glob.settings = SyJson(GLOBAL_SETTINGS_FILE)
     else:
         print('Impossible find run.sh Exiting...')
         exit(1)
