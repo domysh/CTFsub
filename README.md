@@ -4,8 +4,8 @@
 ---
 
 ```
-This is for now a secret repo created for CCIT 2020 A/D final
-After the race, here you will find more informations about the project,
+This is was a secret repo created for CCIT 2020 A/D final
+After some time, here you will find more informations about the project,
 actually the project is intended for the CCIT and after this it will become public
 and more easly managed for other races
 ```
@@ -24,21 +24,7 @@ On logs/flags.log you can also find all taked flags, and in folders you can find
 Program your attack using python template attack_template.py, you can run it in the CTF folder and have the same functionaliies of the program when it run in CTFsub, after you confirmed that the script is working, without changing nothing, put it in the attacks folder and it will start to get your flags!
 
 ---
-
-# TODO list
-
-<ol>
-<li>Debug all functionalities and relase a version</li>
-<li>Create a web endpoint to easily submit (also with a simply get request) flags form external scripts (for example with JS)</li>
-
-</ol>
-
-```
-Example of endpoint:
-http://<my_team_ip>:<port_of_webapi>/<string_with_flags>
-or
-http://<my_team_ip>:<port_of_webapi>/ POST:{'data':<string_with_flags>}
-```
+##Wait some time for an update of the documentation!
 ---
 ### Poliba team CCIT2020
 ---
