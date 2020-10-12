@@ -3,12 +3,9 @@
 
 ---
 
-```
-This was a secret repo created for CCIT 2020 A/D final
-After some time, here you will find more informations about the project,
-actually the project is intended for the CCIT and after this it will become public
-and more easly managed for other races
-```
+This tool was used and created for CCIT (Cyberchallenge.IT) 2020 A/D for sending flags and executing attacks during the race. The tool has been designed in such a way as to make the attacks as efficient as possible but also easy to implement and test. In fact, the program try to use all the potential of the computer through multithreading, avoids repeated attacks against teams that have closed the vulnerability through the autoblacklist that after some failed attacks (excluding closed connection) stops the attacks to that specific team (But anyway some times try ro attack again). Everything is controllable at run time through a shell where operations can be carried out quickly and effectively. The code was released publicly after the CCIT A/D. By modifying the config, the system can be configured for any CTF A / D!
+
+# Take this and hack all teams!1!
 
 ---
 
@@ -23,8 +20,6 @@ On logs/flags.log you can also find all taked flags, and in folders you can find
 ## Attacks
 Program your attack using python template attack_template.py, you can run it in the CTF folder and have the same functionaliies of the program when it run in CTFsub, after you confirmed that the script is working, without changing nothing, put it in the attacks folder and it will start to get your flags!
 
----
-##Wait some time for an update of the documentation!
 ---
 ### Poliba team CCIT2020
 ---
