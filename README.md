@@ -5,7 +5,7 @@
 
 This tool was used and created for CCIT (Cyberchallenge.IT) 2020 A/D for sending flags and executing attacks during the race. The tool has been designed in such a way as to make the attacks as efficient as possible but also easy to implement and test. In fact, the program try to use all the potential of the computer through multithreading, avoids repeated attacks against teams that have closed the vulnerability through the autoblacklist that after some failed attacks (excluding closed connection) stops the attacks to that specific team (But anyway some times try ro attack again). Everything is controllable at run time through a shell where operations can be carried out quickly and effectively. The code was released publicly after the CCIT A/D. By modifying the config, the system can be configured for any CTF A / D!
 
-# Take this and hack all teams!1!
+# Take this and hack all teams !!!1!
 
 ---
 
