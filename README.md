@@ -21,6 +21,11 @@ On logs/flags.log you can also find all taked flags, and in folders you can find
 Program your attack using python template attack_template.py, you can run it in the CTF folder and have the same functionaliies of the program when it run in CTFsub, after you confirmed that the script is working, without changing nothing, put it in the attacks folder and it will start to get your flags!
 
 ---
-### Poliba team CCIT2020
+## Poliba team CCIT2020
+---
+## PizzaOverflow
+<a href="https://pizzaoverflow.it">Web Site</a> - <a href="mailto:overflowpizza@gmail.com">E-Mail</a>
+---
+# Project by DomySh
 ---
 
