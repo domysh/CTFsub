@@ -22,10 +22,9 @@ Program your attack using python template attack_template.py, you can run it in 
 
 ---
 ## Poliba team CCIT2020
----
 ## PizzaOverflow
-<a href="https://pizzaoverflow.it">Web Site</a> - <a href="mailto:overflowpizza@gmail.com">E-Mail</a>
+<small><a href="https://pizzaoverflow.it">Web Site</a> - <a href="mailto:overflowpizza@gmail.com">E-Mail</a><br>
+Project by DomySh</small>
 ---
-# Project by DomySh
----
+
 
