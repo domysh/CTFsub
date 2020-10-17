@@ -29,4 +29,13 @@ PizzaOverflow <a href="https://pizzaoverflow.it">Web Site</a> - <a href="mailto:
 
 ---
 
+## Future changes
+
+<ul>
+  <li>Control on config from start.py</li>
+  <li>Remove sh file and implement it on shell.py</li>
+  <li>Save all flag in a new file (flags.json) and avoid duplicates</li>
+  <li>change the template... make more simple</li>
+</ul>
+
 
