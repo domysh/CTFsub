@@ -36,6 +36,8 @@ PizzaOverflow <a href="https://pizzaoverflow.it">Web Site</a> - <a href="mailto:
   <li>Remove sh file and implement it on shell.py</li>
   <li>Save all flag in a new file (flags.json) and avoid duplicates</li>
   <li>change the template... make more simple</li>
+  <li>Permitt to send a sting from the function of the attack</li>
+  <li>Convert automaticaly bytes to string</li>
 </ul>
 
 
