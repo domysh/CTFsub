@@ -1,5 +1,15 @@
-import datetime, re, utils.config
+import datetime
+from utils.config import PRINT_LOGS
 import os, logging, socket, ipaddress
+
+def check_pid(pid:int):        
+    """ Check For the existence of a unix pid. """
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
 
 def get_time():
     return datetime.datetime.now().strftime("%d-%m-%Y__%H_%M_%S")
@@ -75,7 +85,7 @@ def setup_logger(logger_name, log_file, head_f = '%(asctime)s * %(name)s - %(lev
     fileHandler.setFormatter(formatter)
     log_setup.setLevel(level)
     log_setup.addHandler(fileHandler)
-    if utils.config.PRINT_LOGS:
+    if PRINT_LOGS:
         streamHandler = logging.StreamHandler()
         streamHandler.setFormatter(formatter)
         log_setup.addHandler(streamHandler)

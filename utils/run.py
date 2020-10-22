@@ -4,43 +4,56 @@
 CTFsub(mitter) for CTF A/D
 
 Author: DomySh (Domingo Dirutigliano)
-Contact: domingo.dirutigliano@domysh.com / contact@domysh.com
+Contact: me@domysh.com
 Website: www.domysh.com
 
 '''
+try:
+    import utils
+except:
+    exit("Utils not founed!")
+try:
+    from utils.config import GLOBAL_LOG_FILE, GLOBAL_FLAG_FILE
+except:
+    exit("Failed to import PATH to logs from config")
 
-import requests, os, logging, re, json
-import multiprocessing, time, threading
-import importlib
-from multiprocessing import Pool
-import utils.config, utils.fun
-from time import sleep
-from utils.syjson import SyJson
+try:
+    import multiprocessing, time, threading
+    import importlib, re
+    from time import sleep
+    from utils.syjson import SyJson
+except:
+    exit("Failed to import some libraries")
 
-
-#Creating the loggers
-
-log = utils.fun.setup_logger('CTFsub',utils.config.GLOBAL_LOG_FILE)
-flag_log = utils.fun.setup_logger('flags',utils.config.GLOBAL_FLAG_FILE,'%(asctime)s FLAG: %(message)s')
-
+try:
+    from utils.config import GLOBAL_DATA_FILE, GLOBAL_SETTINGS_FILE, FLAG_REGEX, flag_submit, ATTACK_PKG
+    from utils.config import SHELL_CAN_USE, TIMES_TO_BLACKLIST, ATTACKS_FOLDER, TEAM_IP_RANGE, SEC_SECONDS, TIMEOUT_ATTACK
+    from utils.config import OUR_TEAM_ID, IP_VM_TEMP, THREADING_LIMIT, AUTO_BLACKLIST_ON, TIME_TO_WAIT_IN_BLACKLIST, TICK_TIME
+except Exception as e:
+    exit("Failed to import some configs: "+str(e))
+try:
+    log = utils.fun.setup_logger('CTFsub',GLOBAL_LOG_FILE)
+    flag_log = utils.fun.setup_logger('flags',GLOBAL_FLAG_FILE,'%(asctime)s FLAG: %(message)s')
+except:
+    exit("Failed to create log objects")
 #global vars synced with relative files
 class glob: 
-    constant_vars = SyJson(utils.config.GLOBAL_DATA_FILE)
-    settings = SyJson(utils.config.GLOBAL_SETTINGS_FILE)
+    constant_vars = SyJson(GLOBAL_DATA_FILE)
+    settings = SyJson(GLOBAL_SETTINGS_FILE)
     break_wait_time = False
     break_round_attacks = False
 
 #Function used for submit a flag
 def submit_flag(flags:list):
-    if not utils.config.FLAG_REGEX is None:
+    if not FLAG_REGEX is None:
         #Filtering all recived flags
-        flags = re.findall(utils.config.FLAG_REGEX," ".join(flags)) 
+        flags = re.findall(FLAG_REGEX," ".join(flags)) 
     sended = []
     for flag in flags:
         if flag not in sended:
             try:
                 flag_log.info(flag)
-                utils.config.flag_submit(flag)
+                flag_submit(flag)
                 log.info(f'Submitted to gameserver "{flag}" flag')
                 sended.append(flag)
             except Exception as e:
@@ -50,7 +63,7 @@ def submit_flag(flags:list):
 
 #Get python module file of the attack and use it
 def get_attack_by_name(attack_name,cache_use = False):
-    res = getattr(__import__(f"{utils.config.ATTACK_PKG}.{attack_name}"),attack_name)
+    res = getattr(__import__(f"{ATTACK_PKG}.{attack_name}"),attack_name)
     res = importlib.reload(res) #You you change the program this will change instantly
     return res
 
@@ -87,16 +100,16 @@ def shell_reqest_dispatcher(action,req_dict):
     elif action == 'config':
         if req_dict['operation_type'] == 'get':
             config_name = req_dict['target_key']
-            if config_name in utils.config.SHELL_CAN_USE:
+            if config_name in SHELL_CAN_USE:
                 req_dict['response_value'] = getattr(utils.config, config_name)
                 return True
         elif req_dict['operation_type'] == 'set':
             config_name = req_dict['target_key']
-            if config_name in utils.config.SHELL_CAN_USE:
+            if config_name in SHELL_CAN_USE:
                 setattr(utils.config, config_name, req_dict['target_value'])
                 log.info(f'utils.config.{config_name} assigned to {req_dict["target_value"]}')
         elif req_dict['operation_type'] == 'list':
-            names = utils.config.SHELL_CAN_USE
+            names = SHELL_CAN_USE
             values = []
             for name in names:
                 values.append(getattr(utils.config, name))
@@ -137,7 +150,7 @@ def start_attack(py_attack, assigned_ip):
 
         var_dict = glob.constant_vars[this_attack.attack_name][assigned_ip].var()
         # choose what timeout time to use
-        timeout_process = utils.config.TIMEOUT_ATTACK
+        timeout_process = TIMEOUT_ATTACK
         if not attack_settings['timeout'] is None:
             timeout_process = attack_settings['timeout']
 
@@ -168,7 +181,7 @@ def start_attack(py_attack, assigned_ip):
             else:
                 #Count fail time, if it fails enougth times, we put it in the auto blacklist
                 blacklist_status['fail_times'] += 1
-                if blacklist_status['fail_times'] >= utils.config.TIMES_TO_BLACKLIST:
+                if blacklist_status['fail_times'] >= TIMES_TO_BLACKLIST:
                     #Start auto blacklist
                     blacklist_status['excluded'] = True
                     blacklist_status['stopped_times'] = 0
@@ -203,7 +216,7 @@ def main():
         #Remove Pycache
         while True:  
             #Taking the list of the python executable to run for the attack
-            to_exec = [f for f in utils.fun.get_pythonfile_list(utils.config.ATTACKS_FOLDER) if f != '__init__'] 
+            to_exec = [f for f in utils.fun.get_pythonfile_list(ATTACKS_FOLDER) if f != '__init__'] 
             if len(to_exec) == 0:
                 if wait_for_attacks == False:
                     log.info('Waiting for attacks python files')
@@ -225,17 +238,17 @@ def main():
 
             log.info(f'STARTING {py_f} attack!')
 
-            # repeating the attack for every team
-            for team_id in range( utils.config.TEAM_IP_RANGE[0], utils.config.TEAM_IP_RANGE[1]+1): 
+            # repeating the attack for every team 
+            for team_id in range( TEAM_IP_RANGE[0], TEAM_IP_RANGE[1]+1): 
 
-                if team_id == utils.config.OUR_TEAM_ID: continue # Skiping our team
+                if team_id == OUR_TEAM_ID: continue # Skiping our team
                 #calculating the ip
-                ip_to_attack = utils.fun.get_ip_from_temp(utils.config.IP_VM_TEMP,{'team_id':team_id}) 
+                ip_to_attack = utils.fun.get_ip_from_temp(IP_VM_TEMP, {'team_id':team_id}) 
 
                 if glob.break_round_attacks:break #break attack as requested
                 
                 #Wait for a free thread following the THREADING_LIMIT
-                while len(thread_list) >= utils.config.THREADING_LIMIT:
+                while len(thread_list) >= THREADING_LIMIT:
                     #Wait for a free thread
                     shell_request_manage()    
                     for i in range(len(thread_list)):
@@ -303,11 +316,11 @@ def main():
                             log.warning(f'{py_f} attack on IP {ip_to_attack} in blacklist... skipping')
                             continue
                     #Auto blacklist control
-                    if utils.config.AUTO_BLACKLIST_ON:
+                    if AUTO_BLACKLIST_ON:
                         if attack_blacklist['excluded']:
                             if attack_blacklist['stopped_times'] == -1:
                                 pass # Last time the service was closed so we have to try again to attack
-                            if attack_blacklist['stopped_times'] >= utils.config.TIME_TO_WAIT_IN_BLACKLIST:
+                            if attack_blacklist['stopped_times'] >= TIME_TO_WAIT_IN_BLACKLIST:
                                 log.warning(f'auto_blacklist enabled on ip {ip_to_attack} of {py_f} attack ... trying anyway to execute')
                                 attack_blacklist['stopped_times'] = -1 # If success -1 remember to reset blacklist
                             else:
@@ -349,11 +362,11 @@ def main():
         log.info(f'Attacks for this round finished')
 
         #Wait remaing time
-        time_to_wait = utils.config.TICK_TIME - (time.time() - last_time)
+        time_to_wait = TICK_TIME - (time.time() - last_time)
         if time_to_wait > 0:
             log.info(f'{int(time_to_wait//60)} minutes and {int(time_to_wait)%60} seconds for new round')
             while time_to_wait > 0:
-                time_to_wait = utils.config.TICK_TIME - (time.time() - last_time)
+                time_to_wait = TICK_TIME - (time.time() - last_time)
                 shell_request_manage()
                 if glob.break_wait_time:break
                 sleep(0.1)
@@ -362,7 +375,7 @@ def main():
             glob.break_wait_time = False
         else:
             # Adding SEC_SECONDS seconds
-            for i in reversed(range(1,utils.config.SEC_SECONDS+1)):
+            for i in reversed(range(1,SEC_SECONDS+1)):
                 log.warning(f'{i} second for starting new round')
                 sleep(1)
 
