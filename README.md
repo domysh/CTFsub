@@ -32,12 +32,10 @@ PizzaOverflow <a href="https://pizzaoverflow.it">Web Site</a> - <a href="mailto:
 ## Future changes
 
 <ul>
-  <li>Control on config from start.py</li>
-  <li>Remove sh file and implement it on shell.py</li>
   <li>Save all flag in a new file (flags.json) and avoid duplicates</li>
   <li>change the template... make more simple</li>
-  <li>Permitt to send a sting from the function of the attack</li>
-  <li>Convert automaticaly bytes to string</li>
+  <li>Permitt to send a string from the function of the attack</li>
+  <li>Manage bytes and str return for flag submit</li>
 </ul>
 
 
