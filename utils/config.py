@@ -16,6 +16,8 @@ ATTACKS_FOLDER = pjoin(ROOT_DIR,ATTACK_PKG)
 utils.fun.create_if_not_exist( ATTACKS_FOLDER )
 utils.fun.create_file(pjoin(ATTACKS_FOLDER,'__init__.py'))
 
+DB_NAME = pjoin(LOG_FOLDER,'flags.db')
+
 GLOBAL_DATA_FILE = pjoin(LOG_FOLDER,'g_var.json')
 GLOBAL_SETTINGS_FILE = pjoin(LOG_FOLDER,'settings.json')
 

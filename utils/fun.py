@@ -1,9 +1,10 @@
 import datetime
 from utils.config import PRINT_LOGS
-import os, logging, socket, ipaddress
+import os, logging, socket, ipaddress, sqlite3
 
 def check_pid(pid:int):        
     """ Check For the existence of a unix pid. """
+    if pid < 0: return False
     try:
         os.kill(pid, 0)
     except OSError:
@@ -107,3 +108,25 @@ def is_valid_ip(ip:str):
         return True
     except:pass
     return False
+
+
+#FLAGS DB
+
+INIT_DB_COMMANDS = [
+"""
+CREATE TABLE IF NOT EXISTS flags (
+    id_flag INTEGER PRIMARY KEY,
+    flag TEXT NOT NULL
+)
+"""
+]
+
+def db_init(pid_write:int):
+    db = sqlite3.connect(config.DB_NAME)
+    for statment in config.INIT_DB_COMMANDS:
+        try:
+            db.execute(statment)
+        except:exit("FAILED TO INIT DB!")
+    db.commit()
+    db.close()
+
