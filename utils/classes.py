@@ -1,6 +1,6 @@
 import utils, os, logging
 
-class AttackModel():
+class Attacker():
     #Set the attack name as the file name
     def __init__(self,to_run:callable):
         self.fun_to_run = to_run
@@ -28,9 +28,11 @@ class AttackModel():
         try:
             log.info('STARTING ATTACK')
             result = self.fun_to_run(ip,log,self.glob_dict)
+            log.info('END ATTACK')
             if type(result) is list:
-                log.info('END ATTACK')
                 final_res = result
+            else:
+                final_res = [result]
         except AttackFailed as e: #in case of a closed leak
             log.info('ATTACK IMPOSSIBLE (LEAK_CLOSED)')
             log.exception(e)
@@ -59,4 +61,18 @@ class AttackRequestRefused(Exception):pass #Use when the connection to the serve
 def g_var_set(gvar:dict,key:str,def_val):
     if key not in gvar.keys():
         gvar[key] = def_val
+
+def run_test_case(func:callable,ip:str):
+    import logging, os, json
+    if not os.path.exists('tmp.file.json'): open('tmp.file.json','wt').write('{}')
+    dic_perm = json.loads( open('tmp.file.json','rt').read() )
+    print('After testing please remove "tmp.file.json"')
+    exce = None
+    try:
+        logging.basicConfig(format='LOG: %(message)s',level=logging.INFO)
+        print("Result: ", func(ip,logging.getLogger(__name__), dic_perm) )
+    except Exception as e:exce = e
+    open('tmp.file.json','wt').write(json.dumps(dic_perm))
+    if not exce is None:
+        raise exce
         

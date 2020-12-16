@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import cmd, utils, time, os, subprocess, utils.run, signal
-import multiprocessing, sys
+import multiprocessing, sys, shutil
 from utils.syjson import SyJson
 from utils.config import GLOBAL_SETTINGS_FILE, GLOBAL_DATA_FILE
 from utils.tail import Tail
@@ -15,7 +15,7 @@ def not_started():
     print(('-'*30)+'\nBefore you run the shell,\nyou have to run CTFsub\n'+('-'*30))
     if yes_or_no('Do you want to execute CTFsub?'):
         run_command()
-    else: exit(1)
+    else: exit(0)
 
 def getParamethers(line):
     #if '"' not in line:
@@ -281,13 +281,8 @@ def get_attack_status(attack_name):
     on_off_status_alivectrl(attack_name)
     print_div()
 
-def tail_log(log_name):
-    if log_name == 'global':
-        Tail(utils.config.GLOBAL_LOG_FILE).follow(10,0.3)
-    elif log_name == 'flag':
-        Tail(utils.config.GLOBAL_FLAG_FILE).follow(10,0.3)
-    else:
-        print('Not valid log name')
+def tail_log():
+    Tail(utils.config.GLOBAL_LOG_FILE).follow(10,0.3)
 
 def get_shell_req(print_msg=True):
     try:
@@ -441,6 +436,8 @@ def restart_command():
     run_command(False)
     print("------------- Restart done! -------------")
     
+def clear_command():
+    remove_all_list(["attacks/","logs/","__pycache__/","utils/__pycache__/"])
 
 class CTFsubShell(cmd.Cmd):
 
@@ -540,9 +537,7 @@ class CTFsubShell(cmd.Cmd):
                 }
             }
         },
-        'log':{
-            'log_name::':[tail_log]
-        },
+        'log':[tail_log],
         'shellreq':{
             'break-wait-time':[create_simple_shell_req,('break-wait-time',)],
             'stop-attacks':[create_simple_shell_req,('stop-attacks',)],
@@ -557,7 +552,6 @@ class CTFsubShell(cmd.Cmd):
     hint_vars = {
         'attack_name':list_process_array,
         'config_name':utils.config.SHELL_CAN_USE,
-        'log_name':['global','flag'],
     }
     
 
@@ -666,7 +660,26 @@ class CTFsubShell(cmd.Cmd):
 
 class InvalidCommand(Exception):pass
 
+def rm_if_exists(path):
+    if os.path.exists(path):
+        shutil.rmtree(path)
+
+def remove_all_list(l_path):
+    for ele in l_path:
+        rm_if_exists(ele)
+
 if __name__ == '__main__':
+    os.chdir(os.path.dirname(os.path.abspath(__file__)))
+    if len(sys.argv)>=2:
+        if sys.argv[1] == "clear":
+            if is_running():
+                print("Ops! CTF is running... You can't delete all files.")
+                if yes_or_no('Do you want stop CTFsub and clear directories?'):
+                    stop_command(False)
+                    clear_command()
+            else:
+                clear_command()
+            exit(0)
     if not is_running(): not_started()
     shell = CTFsubShell()
     while True:
