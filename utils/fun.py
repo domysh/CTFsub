@@ -125,3 +125,5 @@ def insert_flag(flag:bytes):
     else: 
         db.close()
         return False
+
+
