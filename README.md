@@ -28,14 +28,6 @@ Program your attack using python template attack_template.py, you can run it in 
 
 ---
 
-## Future changes
-
-<ul>
-  <li>Save all flag in a new file (flags.json) and avoid duplicates</li>
-  <li>change the template... make more simple</li>
-  <li>Permitt to send a string from the function of the attack</li>
-  <li>Manage bytes and str return for flag submit</li>
-  <li>Choose if attack file want use regex or not</li>
-</ul>
+# Not Tested !!
 
 
