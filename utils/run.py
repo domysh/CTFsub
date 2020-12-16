@@ -26,6 +26,11 @@ except:
     exit("Failed to import some libraries")
 
 try:
+    from utils.classes import Attacker
+except:
+    exit("Failed to import Attacker class")
+
+try:
     from utils.config import GLOBAL_DATA_FILE, GLOBAL_SETTINGS_FILE, FLAG_REGEX, flag_submit, ATTACK_PKG
     from utils.config import SHELL_CAN_USE, TIMES_TO_BLACKLIST, ATTACKS_FOLDER, TEAM_IP_RANGE, SEC_SECONDS, TIMEOUT_ATTACK
     from utils.config import OUR_TEAM_ID, IP_VM_TEMP, THREADING_LIMIT, AUTO_BLACKLIST_ON, TIME_TO_WAIT_IN_BLACKLIST, TICK_TIME
@@ -33,7 +38,6 @@ except Exception as e:
     exit("Failed to import some configs: "+str(e))
 try:
     log = utils.fun.setup_logger('CTFsub',GLOBAL_LOG_FILE)
-    flag_log = utils.fun.setup_logger('flags',GLOBAL_FLAG_FILE,'%(asctime)s FLAG: %(message)s')
 except:
     exit("Failed to create log objects")
 #global vars synced with relative files
@@ -44,22 +48,31 @@ class glob:
     break_round_attacks = False
 
 #Function used for submit a flag
-def submit_flag(flags:list):
+def submit_flag(flags_inp:list):
+    for i in range(len(flags_inp)):
+        if type(flags_inp[i]) == str:
+            flags_inp[i] = flags_inp[i].encode()
+    flags = []
     if not FLAG_REGEX is None:
         #Filtering all recived flags
-        flags = re.findall(FLAG_REGEX," ".join(flags)) 
-    sended = []
-    for flag in flags:
-        if flag not in sended:
+        for ele in flags_inp:
             try:
-                flag_log.info(flag)
+                flags += re.findall(FLAG_REGEX,ele) 
+            except:pass
+    else:
+        flags = flags_inp
+
+
+    for flag in flags:
+        try:
+            #print(utils.config.FLAG_REGEX)
+            flag = flag.decode()
+            if utils.fun.insert_flag(flag):
                 flag_submit(flag)
                 log.info(f'Submitted to gameserver "{flag}" flag')
-                sended.append(flag)
-            except Exception as e:
-                log.error(f'Submission of "{flag}" flag, FAILED!, see flag log for details')
-                flag_log.exception(e)
-    del sended
+        except Exception as e:
+            log.error(f'Submission of "{flag}" flag, FAILED!')
+            log.exception(e)
 
 #Get python module file of the attack and use it
 def get_attack_by_name(attack_name,cache_use = False):
@@ -125,13 +138,14 @@ def shell_reqest_dispatcher(action,req_dict):
 def start_attack(py_attack, assigned_ip):
     #Starting the attack...
     try:
-        #Import the file and importing an Istance of the Attack Class
-        this_attack = get_attack_by_name(py_attack).ATTACK
-        this_attack.attack_name = utils.fun.min_name(py_attack)
-        #Verify that is the sub class wanted
-        if not isinstance(this_attack, utils.classes.AttackModel):
-            log.error(f'{py_attack} file havent a Attack Class that is subclass of AttackModel... Skipping attack...')
+        attack_file = get_attack_by_name(py_attack)
+        if "run" in dir(attack_file) and callable(attack_file):
+            log.error(f'{py_attack} havent a run function... please insert it! ... skipping')
             return
+        #Import the file and importing an Istance of the Attack Class
+        this_attack = Attacker(attack_file.run)
+        this_attack.attack_name = utils.fun.min_name(py_attack)
+
         #Get the flag and submit
         flags_obtained = 'leak_closed'
 
@@ -208,44 +222,103 @@ def start_attack(py_attack, assigned_ip):
         log.error(f'An unexpected result recived on {assigned_ip} using {py_attack} attack... continuing')
         log.exception(e)
 
+def get_attack_file_list():
+    wait_for_attacks = False
+    to_exec = []
+    while True:  
+        #Taking the list of the python executable to run for the attack
+        to_exec = [f for f in utils.fun.get_pythonfile_list(ATTACKS_FOLDER) if f != '__init__'] 
+        if len(to_exec) == 0:
+            if wait_for_attacks == False:
+                log.info('Waiting for attacks python files')
+                wait_for_attacks = True
+            time.sleep(.1)
+        else:
+            if wait_for_attacks == True:
+                log.info('Python attack file found! STARTING...')
+            break
+    return to_exec
+
+def init_setting_section():
+    if 'blacklist' not in glob.settings.keys():
+        glob.settings['blacklist'] = {}
+
+    if 'process_controller' not in glob.settings.keys():
+        glob.settings['process_controller'] = {}
+
+def init_settings_for_attack(py_file):
+    if py_file not in glob.settings['blacklist'].keys():
+        glob.settings['blacklist'][py_file] = {}
+    
+    if py_file not in glob.settings['process_controller'].keys():
+        glob.settings['process_controller'][py_file] = {
+            'alive_ctrl':None,
+            'on':True,
+            'whitelist_on':False,
+            'excluded_ip':[],
+            'whitelist_ip':[],
+            'timeout':None
+        }
+        # Try to charge all specific configs from the attack file
+        
+        atk = get_attack_by_name(py_file)
+        if 'PORT' in dir(atk) and not atk.PORT is None and type(atk.PORT) == int:
+            glob.settings['process_controller'][py_file]['alive_ctrl'] = atk.PORT
+        
+        if 'TIMEOUT' in dir(atk) and not atk.TIMEOUT is None and type(atk.TIMEOUT) in (int,float):
+            glob.settings['process_controller'][py_file]['timeout'] = atk.TIMEOUT
+
+        if ('BLACKLIST' in dir(atk) and 'WHITELIST' in dir(atk)):
+            log.warning(f"found in {py_file} BLACKLIST and WHITELIST together... No option setted!")
+            return
+
+        if 'BLACKLIST' in dir(atk) and type(atk.BLACKLIST) == list:
+            glob.settings['process_controller'][py_file]['whitelist_on'] = False
+            glob.settings['process_controller'][py_file]['excluded_ip'] = atk.BLACKLIST
+        
+        if 'WHITELIST' in dir(atk) and type(atk.WHITELIST) == list:
+            glob.settings['process_controller'][py_file]['whitelist_on'] = True
+            glob.settings['process_controller'][py_file]['whitelist_ip'] = atk.WHITELIST
+
+def clear_not_in_list(atk_list):
+    for key_ele in glob.settings['process_controller'].keys():
+        if key_ele not in atk_list:
+            del glob.settings['process_controller'][key_ele]
+            if key_ele in glob.settings['blacklist'].keys():
+                del glob.settings['blacklist'][key_ele]
+
 def main():
+    utils.fun.db_init()
     log.info('CTFsub is starting !')
+    init_setting_section()
     while True:
-        #Wait for find python attack files
-        wait_for_attacks = False
-        #Remove Pycache
-        while True:  
-            #Taking the list of the python executable to run for the attack
-            to_exec = [f for f in utils.fun.get_pythonfile_list(ATTACKS_FOLDER) if f != '__init__'] 
-            if len(to_exec) == 0:
-                if wait_for_attacks == False:
-                    log.info('Waiting for attacks python files')
-                    wait_for_attacks = True
-                time.sleep(.1)
-            else:
-                if wait_for_attacks == True:
-                    log.info('Python attack file found! STARTING...')
-                break
-            
+        attack_list = get_attack_file_list()
+
+        clear_not_in_list(attack_list)
+        
         #Get start time for calculating at the end of the attack how many time have to wait
         last_time = time.time()
-        
         # Start the round
-        flag_log.info('ROUND STARTED')
         log.info('Round Started')
         thread_list = []
-        for py_f in to_exec: #Starting attacks ! 
+        for py_f in attack_list: #Starting attacks ! 
+            try:
+                init_settings_for_attack(py_f)
+            except:
+                log.critical(f"Error in initialize settings of attack {py_f} ... skipping!")
+                continue
 
             log.info(f'STARTING {py_f} attack!')
 
             # repeating the attack for every team 
-            for team_id in range( TEAM_IP_RANGE[0], TEAM_IP_RANGE[1]+1): 
+            for team_id in range( TEAM_IP_RANGE[0], TEAM_IP_RANGE[1]+1 ): 
 
                 if team_id == OUR_TEAM_ID: continue # Skiping our team
                 #calculating the ip
                 ip_to_attack = utils.fun.get_ip_from_temp(IP_VM_TEMP, {'team_id':team_id}) 
 
-                if glob.break_round_attacks:break #break attack as requested
+                #break attack if requested
+                if glob.break_round_attacks:break 
                 
                 #Wait for a free thread following the THREADING_LIMIT
                 while len(thread_list) >= THREADING_LIMIT:
@@ -256,17 +329,6 @@ def main():
                             thr = thread_list.pop(i); del thr
                             break
                     time.sleep(.1)
-                
-
-                # Controlling and creating blacklist and process_controller for every attack
-                if 'blacklist' not in glob.settings.keys():
-                    glob.settings['blacklist'] = {}
-                
-                if 'process_controller' not in glob.settings.keys():
-                    glob.settings['process_controller'] = {}
-
-                if py_f not in glob.settings['blacklist'].keys():
-                    glob.settings['blacklist'][py_f] = {}
 
                 if ip_to_attack not in glob.settings['blacklist'][py_f].keys():
                     glob.settings['blacklist'][py_f][ip_to_attack] = {
@@ -274,30 +336,6 @@ def main():
                         'fail_times':0,
                         'stopped_times':0
                     }
-                
-
-                if py_f not in glob.settings['process_controller'].keys():
-                    glob.settings['process_controller'][py_f] = {
-                        'alive_ctrl':None,
-                        'on':True,
-                        'whitelist_on':False,
-                        'excluded_ip':[],
-                        'whitelist_ip':[],
-                        'timeout':None
-                    }
-                    # Try to charge all specific configs from the attack file
-                    try:
-                        atk = get_attack_by_name(py_f)
-                        if 'CONFIG' in dir(atk):
-                            for k_settings in glob.settings['process_controller'][py_f].keys():
-                                if k_settings in atk.CONFIG.keys():
-                                    glob.settings['process_controller'][py_f][k_settings] = atk.CONFIG[k_settings]
-                        del atk
-                    except Exception as e:
-                        log.error('ERROR LOADING CONFIG FROM ATTACK')
-                        log.exception(e)
-                
- 
 
                 attack_blacklist = glob.settings['blacklist'][py_f][ip_to_attack]
                 attack_settings = glob.settings['process_controller'][py_f]
@@ -378,14 +416,5 @@ def main():
             for i in reversed(range(1,SEC_SECONDS+1)):
                 log.warning(f'{i} second for starting new round')
                 sleep(1)
-
-
-if __name__ == '__main__':
-    try:
-        main()
-    except (KeyboardInterrupt,InterruptedError):
-        log.fatal('CTRL+C Pressed, Closing')
-        print()
-        exit()
 
     

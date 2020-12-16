@@ -1,74 +1,59 @@
+#This is a template for attack file in CTFsub
+#Use this to learn how build a CTFsub compatible attack
+#and learn how to do a test doing a test attack
 from utils.classes import *
-##########################################################
-#                Write here your code
-##########################################################
-#This is the address that the program use while testing
-IP_ADDRESS_DEBUG = "10.10.1.1"
 
-# 'main' function
+#This is the address that the program use while testing
+TEST_IP_TARGET = "10.10.1.1" #DON'T USE THIS IN run FUNCTION!
+
+#CTFsub configs
+#This settings doesn't work while running as test
+
+#Following variables are READED from CTFsub
+#These variables are optional, you can remove variables
+#you don't Use, Thay will take the default value
+
+PORT = None, #Insert the number of the port for see 
+            #if the service is on before start the attack
+                
+TIMEOUT = None #Every instace of the attack have a timeout setted in configs
+            #Set here a custom timeout for this process
+            #None = Use Global Timeout
+
+#Filter option (Use only one of these vars)
+#If you define all this 2 variables, CTFsub will ignore it
+
+#BLACKLIST = ['127.0.0.1'] # List of ip to skip
+#WHITELIST = ['127.0.0.1'] # Only this list of IP will be attacked
+
+
+# Special Exceptions to use
+# 1. raise AttackFailed() -> say to CTFsub that the vuln is closed
+# 2. raise AttackRequestRefused() -> say to CTFsub that the service is not responding
+# 3. every other Error will be logged and CTFsub take it as a Failed Attack
+# Write here the "main" function of the attack
 def run(ip,log,g_var):
+    # ip = use this variable to set the ip to attack... CTFsub will change it for every team
+    # log = user this logger object for write messages in the log related file
+    # g_var = this dict don't change for attacks with the same type of attack and IP
+            #It is saved in a json file by CTFsub, only with a clear operation 
+            #The Values are resetted, you can change these values with the CTFsub shell
+
+    #Create a variable in g_var with an initial value
+    #for every variable you use in g_var call this function first
     g_var_set(g_var,'count',0)
     
+    #Logging example
     log.info(f"Success! Test g_var status: {g_var['count']}")
+
+    #g_var use example
     g_var['count'] +=1
     
-    return ['a long string that may contain a flag but in this case NOPE']
+    #Return a flag or an array of flags (types accepted str,bytes,list)
+    #If in config is setted a FLAG_REGEX, CTFsub will automatically filter this/these string/s
+    return ['flag1','flag2']
 
-
-'''
-Insert here the port of the service if you want a control
-of his status (if the service not responde skip the ip)
-if active_ctrl is None or you remove CONFIG, CTFsub will skip this
-control (You can segnal off status of the service raising AttackRequestRefused())
-'''
-CONFIG = {
-    'alive_ctrl':None,
-    'on':True,
-    'timeout':None
-}
-
-"""
-if you are in the situation that you have to 
-send a signal for say that the vuln is closed use:
-raise AttackFailed()
-
-Instead if you want comunicate that the service is closed:
-raise AttackRequestRefused()
-
-When you have to full the array, remember that you can insert into it also 
-long strings containing the flag (or more flag), before submitting all flags are filtered
-
-for using g_vars, inizialize tham using:  
-g_var_set(g_var,name_of_var,start_val)
-
-than use it as a dict:
-g_var[name] = var
-or
-function(g_var[var_to_pass])
-"""
-
-##########################################################
-#                    End code part
-##########################################################
-
-#Ignore code under this comment
-
-global ATTACK
-if __name__ == '__main__':
-    import logging, os, json
-    if not os.path.exists('tmp.file.json'): open('tmp.file.json','wt').write('{}')
-    dic_perm = json.loads( open('tmp.file.json','rt').read() )
-    print('After testing please remove "tmp.file.json"')
-    exce = None
-    try:
-        logging.basicConfig(format='LOG: %(message)s',level=logging.INFO)
-        print("Result: ", run(IP_ADDRESS_DEBUG,logging.getLogger(__name__), dic_perm) )
-    except Exception as e:exce = e
-    open('tmp.file.json','wt').write(json.dumps(dic_perm))
-    if not exce is None:
-        raise exce 
-else:
-    global ATTACK
-    ATTACK = utils.classes.AttackModel(run)
-
-    
+#For test this program, put this program in CTFsub 
+#directory (not the attack directory) and run it with python3
+#When you put this script in attack folder, CTFsub will automaticaly run this.
+if __name__ == '__main__': run_test_case(run,TEST_IP_TARGET)

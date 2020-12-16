@@ -1,5 +1,8 @@
 from config import *
 
+if type(FLAG_REGEX) == str:
+    FLAG_REGEX = FLAG_REGEX.encode()
+
 #If this is true and you start the program from start.py you can see all the logs in stdout
 PRINT_LOGS = False
 
@@ -17,6 +20,15 @@ utils.fun.create_if_not_exist( ATTACKS_FOLDER )
 utils.fun.create_file(pjoin(ATTACKS_FOLDER,'__init__.py'))
 
 DB_NAME = pjoin(LOG_FOLDER,'flags.db')
+
+INIT_DB_COMMANDS = [
+"""
+CREATE TABLE IF NOT EXISTS flags (
+    id_flag INTEGER PRIMARY KEY,
+    flag TEXT NOT NULL
+)
+"""
+]
 
 GLOBAL_DATA_FILE = pjoin(LOG_FOLDER,'g_var.json')
 GLOBAL_SETTINGS_FILE = pjoin(LOG_FOLDER,'settings.json')

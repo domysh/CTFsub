@@ -1,5 +1,5 @@
 #Inset here the regex for the flag for a better selection, else insert None
-FLAG_REGEX = 'flg\\{[A-Za-z0-9]{25}\\}'
+FLAG_REGEX = None
 
 #here you can create you template ip for generate address go other teams
 #@Team_id will be substituded with a number in TEAM_IP_RANGE
@@ -25,6 +25,4 @@ TIME_TO_WAIT_IN_BLACKLIST = 6
 
 #This function will be used for submit recived flags so you can adapt this for your A/D gameserver
 def flag_submit(flag:str):
-    import requests
-    requests.post('https://finals.cyberchallenge.it/submit',
-        data={'team_token': '461KEFD3kfscDZPx', 'flag': flag},timeout=3)
+    import requests # Very usefull library :D
