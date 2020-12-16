@@ -1,10 +1,20 @@
 from config import *
+import utils.fun
 
 if type(FLAG_REGEX) == str:
     FLAG_REGEX = FLAG_REGEX.encode()
 
-#If this is true and you start the program from start.py you can see all the logs in stdout
-PRINT_LOGS = False
+TEAMS_LIST = []
+
+try:
+    if not USE_IP_TEMPLATE:
+        TEAMS_LIST = TEAMS_IPS
+    else:
+        for team_id in range(TEAM_IP_RANGE[0],TEAM_IP_RANGE[1]+1):
+            if team_id == OUR_TEAM_ID: continue
+            TEAMS_LIST.append(utils.fun.get_ip_from_temp(IP_VM_TEMP, {'team_id':team_id})) 
+except:
+    exit("Error configuring teams!")
 
 #Config for folders and other... Changing these settings can be dangerous!
 
@@ -42,3 +52,5 @@ utils.fun.create_file(GLOBAL_LOG_FILE)
 SHELL_CAN_USE = ['FLAG_REGEX','TICK_TIME','SEC_SECONDS',
                 'TIMEOUT_ATTACK','THREADING_LIMIT','AUTO_BLACKLIST_ON',
                 'TIMES_TO_BLACKLIST','TIME_TO_WAIT_IN_BLACKLIST']
+
+

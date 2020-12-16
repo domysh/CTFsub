@@ -32,9 +32,8 @@ TIMEOUT = None #Every instace of the attack have a timeout setted in configs
 # 2. raise AttackRequestRefused() -> say to CTFsub that the service is not responding
 # 3. every other Error will be logged and CTFsub take it as a Failed Attack
 # Write here the "main" function of the attack
-def run(ip,log,g_var):
+def run(ip,g_var):
     # ip = use this variable to set the ip to attack... CTFsub will change it for every team
-    # log = user this logger object for write messages in the log related file
     # g_var = this dict don't change for attacks with the same type of attack and IP
             #It is saved in a json file by CTFsub, only with a clear operation 
             #The Values are resetted, you can change these values with the CTFsub shell
@@ -43,8 +42,8 @@ def run(ip,log,g_var):
     #for every variable you use in g_var call this function first
     g_var_set(g_var,'count',0)
     
-    #Logging example
-    log.info(f"Success! Test g_var status: {g_var['count']}")
+    #print information (Redirected to log)
+    print(f"Success! Test g_var status: {g_var['count']}")
 
     #g_var use example
     g_var['count'] +=1

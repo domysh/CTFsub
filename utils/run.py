@@ -14,32 +14,33 @@ except:
     exit("Utils not founed!")
 try:
     from utils.config import GLOBAL_LOG_FILE, GLOBAL_FLAG_FILE
-except:
-    exit("Failed to import PATH to logs from config")
+except Exception as e:
+    exit("Failed to import PATH to logs from config: "+str(e))
 
 try:
     import multiprocessing, time, threading
-    import importlib, re
+    import importlib, re, sys, os
     from time import sleep
     from utils.syjson import SyJson
-except:
-    exit("Failed to import some libraries")
+except Exception as e:
+    exit("Failed to import some libraries: "+str(e))
 
 try:
     from utils.classes import Attacker
-except:
-    exit("Failed to import Attacker class")
+except Exception as e:
+    exit("Failed to import Attacker class: "+str(e))
 
 try:
     from utils.config import GLOBAL_DATA_FILE, GLOBAL_SETTINGS_FILE, FLAG_REGEX, flag_submit, ATTACK_PKG
-    from utils.config import SHELL_CAN_USE, TIMES_TO_BLACKLIST, ATTACKS_FOLDER, TEAM_IP_RANGE, SEC_SECONDS, TIMEOUT_ATTACK
-    from utils.config import OUR_TEAM_ID, IP_VM_TEMP, THREADING_LIMIT, AUTO_BLACKLIST_ON, TIME_TO_WAIT_IN_BLACKLIST, TICK_TIME
+    from utils.config import SHELL_CAN_USE, TIMES_TO_BLACKLIST, ATTACKS_FOLDER, SEC_SECONDS, TIMEOUT_ATTACK
+    from utils.config import THREADING_LIMIT, AUTO_BLACKLIST_ON, TIME_TO_WAIT_IN_BLACKLIST, TICK_TIME, TEAMS_LIST
 except Exception as e:
     exit("Failed to import some configs: "+str(e))
+
 try:
-    log = utils.fun.setup_logger('CTFsub',GLOBAL_LOG_FILE)
-except:
-    exit("Failed to create log objects")
+    log = utils.fun.setup_logger('CTFsub', GLOBAL_LOG_FILE)
+except Exception as e:
+    exit("Failed to create log objects: "+str(e))
 #global vars synced with relative files
 class glob: 
     constant_vars = SyJson(GLOBAL_DATA_FILE)
@@ -65,8 +66,6 @@ def submit_flag(flags_inp:list):
 
     for flag in flags:
         try:
-            #print(utils.config.FLAG_REGEX)
-            flag = flag.decode()
             if utils.fun.insert_flag(flag):
                 flag_submit(flag)
                 log.info(f'Submitted to gameserver "{flag}" flag')
@@ -137,6 +136,7 @@ def shell_reqest_dispatcher(action,req_dict):
 #Thread function that have to execute a function
 def start_attack(py_attack, assigned_ip):
     #Starting the attack...
+    set_stdstreams()
     try:
         attack_file = get_attack_by_name(py_attack)
         if "run" in dir(attack_file) and callable(attack_file):
@@ -287,7 +287,16 @@ def clear_not_in_list(atk_list):
             if key_ele in glob.settings['blacklist'].keys():
                 del glob.settings['blacklist'][key_ele]
 
+def set_stdstreams():
+    f_tmp = open(os.devnull, 'r')
+    sys.stdin = f_tmp
+    f_tmp = open(os.devnull, 'r')
+    sys.stout = f_tmp
+    f_tmp = open(os.devnull, 'r')
+    sys.sterr = f_tmp
+
 def main():
+    set_stdstreams()
     utils.fun.db_init()
     log.info('CTFsub is starting !')
     init_setting_section()
@@ -310,12 +319,7 @@ def main():
 
             log.info(f'STARTING {py_f} attack!')
 
-            # repeating the attack for every team 
-            for team_id in range( TEAM_IP_RANGE[0], TEAM_IP_RANGE[1]+1 ): 
-
-                if team_id == OUR_TEAM_ID: continue # Skiping our team
-                #calculating the ip
-                ip_to_attack = utils.fun.get_ip_from_temp(IP_VM_TEMP, {'team_id':team_id}) 
+            for ip_to_attack in TEAMS_LIST:  
 
                 #break attack if requested
                 if glob.break_round_attacks:break 

@@ -653,7 +653,9 @@ class CTFsubShell(cmd.Cmd):
                     return self.get_full_hint(list(hint_list.keys()),text)
             else:
                 return []
-    
+   
+    def do_EOF(self, line):
+        exit()
     def do_exit(self,line):
         "Exit from CTFsub command line"
         exit()

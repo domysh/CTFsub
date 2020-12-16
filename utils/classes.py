@@ -1,4 +1,4 @@
-import utils, os, logging
+import utils, os, logging, sys
 
 class Attacker():
     #Set the attack name as the file name
@@ -23,26 +23,31 @@ class Attacker():
         utils.fun.create_file(file_name)
         log = utils.fun.setup_logger(self.attack_name+' - '+ip,file_name,'%(asctime)s * '+self.ip_to_attack+' * %(name)s - %(levelname)s: %(message)s')
 
+        f_tmp = open(os.devnull, 'r')
+        sys.stdin = f_tmp
+        sys.stdout = LogStdout(log)
+        sys.stderr = LogStderr(log)
+
         #Do the attack
         final_res = None
         try:
-            log.info('STARTING ATTACK')
-            result = self.fun_to_run(ip,log,self.glob_dict)
-            log.info('END ATTACK')
+            log.warning('STARTING ATTACK')
+            result = self.fun_to_run(ip,self.glob_dict)
+            log.warning('END ATTACK')
             if type(result) is list:
                 final_res = result
             else:
                 final_res = [result]
         except AttackFailed as e: #in case of a closed leak
-            log.info('ATTACK IMPOSSIBLE (LEAK_CLOSED)')
+            log.warning('ATTACK IMPOSSIBLE (LEAK_CLOSED)')
             log.exception(e)
             final_res = 'leak_closed' 
         except AttackRequestRefused as e: # in case the service is closed
-            log.info('ATTACK IMPOSSIBLE BECAUSE THE SERVICE IS CLOSED')
+            log.warning('ATTACK IMPOSSIBLE BECAUSE THE SERVICE IS CLOSED')
             log.exception(e)
             final_res = 'service_closed'
         except Exception as e:
-            log.info('ATTACK STOPPED FOR AND ERROR')
+            log.warning('ATTACK STOPPED FOR AND ERROR')
             log.exception(e)
             final_res = None
         finally:
@@ -58,20 +63,55 @@ class Attacker():
 class AttackFailed(Exception):pass         #Use when the vuln is closed
 class AttackRequestRefused(Exception):pass #Use when the connection to the server is impossible
 
+class LogStdout(object):
+    def __init__(self,log_obj):
+        self.log_obj = log_obj
+        self.readable = False
+
+    def write(self,string):
+        if len(string)==0:return
+        for line in string.split('\n'):
+            if len(line) == 0: continue
+            self.log_obj.info(line)
+    
+    def flush():pass
+    def flush(a):pass
+
+class LogStderr(object):
+    def __init__(self,log_obj):
+        self.log_obj = log_obj
+        self.readable = False
+
+    def write(self,string):
+        if len(string)==0:return
+        for line in string.split('\n'):
+            if len(line) == 0: continue
+            self.log_obj.info(line)
+
+    def flush():pass
+    def flush(a):pass
+
 def g_var_set(gvar:dict,key:str,def_val):
     if key not in gvar.keys():
         gvar[key] = def_val
 
 def run_test_case(func:callable,ip:str):
     import logging, os, json
-    if not os.path.exists('tmp.file.json'): open('tmp.file.json','wt').write('{}')
+    if not os.path.exists('tmp.file.json'):
+        print('After testing please remove "tmp.file.json"')
+        open('tmp.file.json','wt').write('{}')
     dic_perm = json.loads( open('tmp.file.json','rt').read() )
-    print('After testing please remove "tmp.file.json"')
     exce = None
     try:
         logging.basicConfig(format='LOG: %(message)s',level=logging.INFO)
-        print("Result: ", func(ip,logging.getLogger(__name__), dic_perm) )
-    except Exception as e:exce = e
+        log_obj = logging.getLogger(__name__)
+        f_tmp = open(os.devnull, 'r')
+        sys.stdin = f_tmp
+        sys.stdout = LogStdout(log_obj)
+        sys.stderr = LogStderr(log_obj)
+        print("Result: ", func(ip, dic_perm) )
+    except Exception as e:
+        exce = e
     open('tmp.file.json','wt').write(json.dumps(dic_perm))
     if not exce is None:
         raise exce

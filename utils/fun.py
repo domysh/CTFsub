@@ -1,7 +1,5 @@
-import datetime
-from utils.config import PRINT_LOGS
-import os, logging, socket, ipaddress, sqlite3
-import utils.fun
+import datetime, os, logging, socket, ipaddress, sqlite3
+import utils.config
 
 def check_pid(pid:int):        
     """ Check For the existence of a unix pid. """
@@ -77,7 +75,6 @@ def get_ip_from_temp(tem:str,data:dict):
         else:
             raise Exception('Not a valid IP Temp')
     return '.'.join(res)
-            
 
 def setup_logger(logger_name, log_file, head_f = '%(asctime)s * %(name)s - %(levelname)s: %(message)s', level=logging.INFO):
 
@@ -87,11 +84,6 @@ def setup_logger(logger_name, log_file, head_f = '%(asctime)s * %(name)s - %(lev
     fileHandler.setFormatter(formatter)
     log_setup.setLevel(level)
     log_setup.addHandler(fileHandler)
-    if PRINT_LOGS:
-        streamHandler = logging.StreamHandler()
-        streamHandler.setFormatter(formatter)
-        log_setup.addHandler(streamHandler)
-
     return log_setup
 
 def close_logger(log):
@@ -119,7 +111,7 @@ def db_init():
     db.commit()
     db.close()
 
-def insert_flag(flag:str):
+def insert_flag(flag:bytes):
     db = sqlite3.connect(utils.config.DB_NAME)
     cur = db.cursor()
     cur.execute("SELECT flag FROM flags WHERE flag = ?",[flag])
