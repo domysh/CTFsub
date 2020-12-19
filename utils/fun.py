@@ -77,7 +77,6 @@ def get_ip_from_temp(tem:str,data:dict):
     return '.'.join(res)
 
 def setup_logger(logger_name, log_file, head_f = '%(asctime)s * %(name)s - %(levelname)s: %(message)s', level=logging.INFO):
-
     log_setup = logging.getLogger(logger_name)
     formatter = logging.Formatter(head_f)
     fileHandler = logging.FileHandler(log_file, mode='a')
