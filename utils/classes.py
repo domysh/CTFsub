@@ -74,8 +74,7 @@ class LogStdout(object):
             if len(line) == 0: continue
             self.log_obj.info(line)
     
-    def flush():pass
-    def flush(a):pass
+    def flush(self,a=None):pass
 
 class LogStderr(object):
     def __init__(self,log_obj):
@@ -88,8 +87,7 @@ class LogStderr(object):
             if len(line) == 0: continue
             self.log_obj.info(line)
 
-    def flush():pass
-    def flush(a):pass
+    def flush(self,a=None):pass
 
 def g_var_set(gvar:dict,key:str,def_val):
     if key not in gvar.keys():
