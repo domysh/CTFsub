@@ -2,3 +2,4 @@ requests
 lxml
 pwntool
 sqlite3
+syjson

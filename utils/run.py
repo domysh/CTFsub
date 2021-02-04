@@ -21,7 +21,7 @@ try:
     import multiprocessing, time, threading
     import importlib, re, sys, os
     from time import sleep
-    from utils.syjson import SyJson
+    from syjson import SyJson
 except Exception as e:
     exit("Failed to import some libraries: "+str(e))
 
@@ -43,8 +43,8 @@ except Exception as e:
     exit("Failed to create log objects: "+str(e))
 #global vars synced with relative files
 class glob: 
-    constant_vars = SyJson(GLOBAL_DATA_FILE)
-    settings = SyJson(GLOBAL_SETTINGS_FILE)
+    constant_vars = SyJson(GLOBAL_DATA_FILE, get_primitives = True)
+    settings = SyJson(GLOBAL_SETTINGS_FILE, get_primitives = True)
     break_wait_time = False
     break_round_attacks = False
 

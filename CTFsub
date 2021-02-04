@@ -1,14 +1,14 @@
 #!/usr/bin/python3
 import cmd, utils, time, os, subprocess, utils.run, signal
 import multiprocessing, sys, shutil
-from utils.syjson import SyJson
+from syjson import SyJson
 from utils.config import GLOBAL_SETTINGS_FILE, GLOBAL_DATA_FILE
 from utils.tail import Tail
 
 NOT_STARTED = False
 class glob:
-    g_var = SyJson(GLOBAL_DATA_FILE)
-    settings = SyJson(GLOBAL_SETTINGS_FILE)
+    g_var = SyJson(GLOBAL_DATA_FILE, get_primitives = True)
+    settings = SyJson(GLOBAL_SETTINGS_FILE, get_primitives = True)
     NOT_STARTED = False
 
 def not_started():
