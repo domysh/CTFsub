@@ -13,7 +13,7 @@ This tool was used and created for CCIT (Cyberchallenge.IT) 2020 A/D for sending
 Install all requirements with pip for make runnable this program with
 
 ```bash
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 
 ## Configuration
