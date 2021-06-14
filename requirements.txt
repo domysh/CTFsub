@@ -1,5 +1,5 @@
 requests
 lxml
-pwntool
+pwntools
 sqlite3
 syjson
