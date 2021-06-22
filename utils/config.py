@@ -1,8 +1,8 @@
 from config import *
 import utils.fun
 
-if type(FLAG_REGEX) == str:
-    FLAG_REGEX = FLAG_REGEX.encode()
+if type(FLAG_REGEX) == bytes:
+    FLAG_REGEX = FLAG_REGEX.decode()
 
 TEAMS_LIST = []
 
@@ -49,8 +49,8 @@ utils.fun.create_file(GLOBAL_LOG_FILE)
 GLOBAL_FLAG_FILE = pjoin(LOG_FOLDER,'flags.log')
 utils.fun.create_file(GLOBAL_LOG_FILE)
 
-SHELL_CAN_USE = ['FLAG_REGEX','TICK_TIME','SEC_SECONDS',
-                'TIMEOUT_ATTACK','THREADING_LIMIT','AUTO_BLACKLIST_ON',
+SHELL_CAN_USE = ['FLAG_REGEX','TICK_TIME','TIMEOUT_ATTACK',
+                'THREADING_LIMIT','AUTO_BLACKLIST_ON',
                 'TIMES_TO_BLACKLIST','TIME_TO_WAIT_IN_BLACKLIST']
 
 

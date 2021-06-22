@@ -13,7 +13,7 @@ try:
 except:
     exit("Utils not founed!")
 try:
-    from utils.config import GLOBAL_LOG_FILE, GLOBAL_FLAG_FILE
+    from utils.config import GLOBAL_LOG_FILE
 except Exception as e:
     exit("Failed to import PATH to logs from config: "+str(e))
 
@@ -26,14 +26,15 @@ except Exception as e:
     exit("Failed to import some libraries: "+str(e))
 
 try:
-    from utils.classes import Attacker
+    from utils.classes import Attacker, FlagSubmitFailed, WrongFlagSubmit
 except Exception as e:
     exit("Failed to import Attacker class: "+str(e))
 
 try:
     from utils.config import GLOBAL_DATA_FILE, GLOBAL_SETTINGS_FILE, FLAG_REGEX, flag_submit, ATTACK_PKG
-    from utils.config import SHELL_CAN_USE, TIMES_TO_BLACKLIST, ATTACKS_FOLDER, SEC_SECONDS, TIMEOUT_ATTACK
+    from utils.config import SHELL_CAN_USE, TIMES_TO_BLACKLIST, ATTACKS_FOLDER, TIMEOUT_ATTACK
     from utils.config import THREADING_LIMIT, AUTO_BLACKLIST_ON, TIME_TO_WAIT_IN_BLACKLIST, TICK_TIME, TEAMS_LIST
+    from utils.config import SUBMIT_DUPLICATED_FLAGS, MULTIPLE_FLAG_SUBMIT, MAX_FLAG_SUBMIT, FLAG_SUBMISSION_TIME_LIMIT
 except Exception as e:
     exit("Failed to import some configs: "+str(e))
 
@@ -47,36 +48,93 @@ class glob:
     settings = SyJson(GLOBAL_SETTINGS_FILE, get_primitives = True)
     break_wait_time = False
     break_round_attacks = False
+    flag_submit_access = threading.Lock() #Manage flag_submit between flags
+    last_sumbission_time = 0
+
+def timed_submit(flag):
+    if not FLAG_SUBMISSION_TIME_LIMIT is None and FLAG_SUBMISSION_TIME_LIMIT > 0:
+        while True:
+            wait_seconds = glob.last_sumbission_time - time.time()
+            if wait_seconds >= FLAG_SUBMISSION_TIME_LIMIT:
+                glob.last_sumbission_time = time.time()
+                break
+        sleep(.1)
+    flag_submit(flag)
 
 #Function used for submit a flag
-def submit_flag(flags_inp:list):
-    for i in range(len(flags_inp)):
-        if type(flags_inp[i]) == str:
-            flags_inp[i] = flags_inp[i].encode()
+def submit_flag(flags_inp:list,regex):
     flags = []
-    if not FLAG_REGEX is None:
+    if not regex is None:
         #Filtering all recived flags
         for ele in flags_inp:
             try:
-                flags += re.findall(FLAG_REGEX,ele) 
-            except:pass
+                if type(ele) == bytes:
+                    res = re.findall(regex.encode(),ele)
+                    flags += [ele.decode() for ele in res]
+                else:
+                    flags += re.findall(regex,ele) 
+            except Exception as e:
+                log.error(f'Flag filter using regex {regex} failed! You maybe losting flags for a malconfigured REGEX')
+                log.exception(e)
     else:
-        flags = flags_inp
+        for ele in flags_inp:
+            if type(ele) == str:
+                flags.append(ele)
+            elif type(ele) == bytes:
+                flags.append(ele.decode())
 
-
-    for flag in flags:
-        try:
-            if utils.fun.insert_flag(flag):
-                flag_submit(flag)
-                log.info(f'Submitted to gameserver "{flag}" flag')
-        except Exception as e:
-            log.error(f'Submission of "{flag}" flag, FAILED!')
-            log.exception(e)
+    glob.flag_submit_access.acquire() #Critical Zone
+    
+    glob.settings.create("failed_flags",[])
+    flags = list(set(glob.settings["failed_flags"].var()+flags))
+    glob.settings["failed_flags"] = []
+    if MULTIPLE_FLAG_SUBMIT:
+        first_limit = 0
+        loop_iterator = list(range(MAX_FLAG_SUBMIT,len(flags)+1,MAX_FLAG_SUBMIT))
+        if loop_iterator[-1] != len(flags): loop_iterator.append(len(flags))
+        for last_limit in loop_iterator:
+            flag_packet = flags[first_limit:last_limit]
+            try:
+                if not SUBMIT_DUPLICATED_FLAGS:
+                    flag_packet = [ele for ele in flag_packet if not utils.fun.is_duplicated(ele)]
+                if len(flag_packet) > 0:
+                    timed_submit(flag_packet)
+                    for ele in flag_packet: utils.fun.insert_flag(ele)
+                    log.info(f'Flags submitted to gameserver "{flag_packet}"')
+            except WrongFlagSubmit:
+                log.warning(f'Wrong flag segnalated "{flag_packet}"')
+            except FlagSubmitFailed:
+                log.warning(f'Flags "{flag_packet}" submit failed... submit will be retried')
+                glob.settings["failed_flags"] = glob.settings["failed_flags"].var() + flag_packet
+            except Exception as e:
+                log.error(f'Submission of "{flag_packet}" flag, FAILED!')
+                glob.settings["failed_flags"] = glob.settings["failed_flags"].var() + flag_packet
+                log.exception(e)
+            first_limit = last_limit
+        
+    else:
+        for flag in flags:
+            try:
+                if SUBMIT_DUPLICATED_FLAGS or not utils.fun.is_duplicated(flag):
+                    timed_submit(flag)
+                    utils.fun.insert_flag(flag)
+                    log.info(f'Flag submitted to gameserver "{flag}"')
+            except WrongFlagSubmit:
+                log.warning(f'Wrong flag segnalated "{flag}"')
+            except FlagSubmitFailed:
+                log.warning(f'Flag "{flag}" submit failed... submit will be retried')
+                glob.settings["failed_flags"].append(flag)
+            except Exception as e:
+                log.error(f'Submission of "{flag}" flag, FAILED!')
+                glob.settings["failed_flags"].append(flag)
+                log.exception(e)
+    glob.flag_submit_access.release() #Critical Zone - END
 
 #Get python module file of the attack and use it
 def get_attack_by_name(attack_name,cache_use = False):
     res = getattr(__import__(f"{ATTACK_PKG}.{attack_name}"),attack_name)
-    res = importlib.reload(res) #You you change the program this will change instantly
+    if not cache_use:
+        res = importlib.reload(res) #You you change the program this will change instantly
     return res
 
 def shell_request_manage():
@@ -139,8 +197,8 @@ def start_attack(py_attack, assigned_ip):
     set_stdstreams()
     try:
         attack_file = get_attack_by_name(py_attack)
-        if "run" in dir(attack_file) and callable(attack_file):
-            log.error(f'{py_attack} havent a run function... please insert it! ... skipping')
+        if "run" not in dir(attack_file) or not callable(attack_file.run):
+            log.error(f'{py_attack} haven\'t a run function... please insert it! ... skipping')
             return
         #Import the file and importing an Istance of the Attack Class
         this_attack = Attacker(attack_file.run)
@@ -210,12 +268,18 @@ def start_attack(py_attack, assigned_ip):
             log.warning(f'Find closed service to {assigned_ip} using {py_attack} attack !')
         else:
             # if the attack went successfully send the flag and reset blacklist status (Usefull for an attack reopened)
-            blacklist_status = {
+            blacklist_status.sync({
                     'excluded':False,
                     'fail_times':0,
                     'stopped_times':0
-            }
-            submit_flag(flags_obtained)
+            })
+            if attack_settings['custom_regex'] == False:
+                submit_flag(flags_obtained,None)
+            elif type(attack_settings['custom_regex']) == str:
+                submit_flag(flags_obtained,attack_settings['custom_regex'])
+            else:
+                submit_flag(flags_obtained,FLAG_REGEX)
+
             
     #Fail case (return result form attack script isn't what we expected)
     except Exception as e:
@@ -257,28 +321,36 @@ def init_settings_for_attack(py_file):
             'whitelist_on':False,
             'excluded_ip':[],
             'whitelist_ip':[],
-            'timeout':None
+            'timeout':None,
+            'custom_regex':None
         }
         # Try to charge all specific configs from the attack file
         
-        atk = get_attack_by_name(py_file)
-        if 'PORT' in dir(atk) and not atk.PORT is None and type(atk.PORT) == int:
-            glob.settings['process_controller'][py_file]['alive_ctrl'] = atk.PORT
-        
-        if 'TIMEOUT' in dir(atk) and not atk.TIMEOUT is None and type(atk.TIMEOUT) in (int,float):
-            glob.settings['process_controller'][py_file]['timeout'] = atk.TIMEOUT
+    atk = get_attack_by_name(py_file)
+    if 'PORT' in dir(atk) and not atk.PORT is None and type(atk.PORT) == int:
+        glob.settings['process_controller'][py_file]['alive_ctrl'] = atk.PORT
+    
+    if 'TIMEOUT' in dir(atk) and not atk.TIMEOUT is None and type(atk.TIMEOUT) in (int,float):
+        glob.settings['process_controller'][py_file]['timeout'] = atk.TIMEOUT
 
-        if ('BLACKLIST' in dir(atk) and 'WHITELIST' in dir(atk)):
-            log.warning(f"found in {py_file} BLACKLIST and WHITELIST together... No option setted!")
-            return
+    if ('BLACKLIST' in dir(atk) and 'WHITELIST' in dir(atk)):
+        log.warning(f"found in {py_file} BLACKLIST and WHITELIST together... No option setted!")
+        return
 
-        if 'BLACKLIST' in dir(atk) and type(atk.BLACKLIST) == list:
-            glob.settings['process_controller'][py_file]['whitelist_on'] = False
-            glob.settings['process_controller'][py_file]['excluded_ip'] = atk.BLACKLIST
-        
-        if 'WHITELIST' in dir(atk) and type(atk.WHITELIST) == list:
-            glob.settings['process_controller'][py_file]['whitelist_on'] = True
-            glob.settings['process_controller'][py_file]['whitelist_ip'] = atk.WHITELIST
+    if 'BLACKLIST' in dir(atk) and type(atk.BLACKLIST) == list:
+        glob.settings['process_controller'][py_file]['whitelist_on'] = False
+        glob.settings['process_controller'][py_file]['excluded_ip'] = atk.BLACKLIST
+    
+    if 'WHITELIST' in dir(atk) and type(atk.WHITELIST) == list:
+        glob.settings['process_controller'][py_file]['whitelist_on'] = True
+        glob.settings['process_controller'][py_file]['whitelist_ip'] = atk.WHITELIST
+
+    if 'FLAG_REGEX' in dir(atk):
+        if type(atk.FLAG_REGEX) in (str,bytes):
+            if type(atk.FLAG_REGEX) == bytes: atk.FLAG_REGEX = atk.FLAG_REGEX.decode()
+            glob.settings['process_controller'][py_file]['custom_regex'] = atk.FLAG_REGEX
+        elif atk.FLAG_REGEX is None:
+            glob.settings['process_controller'][py_file]['custom_regex'] = False
 
 def clear_not_in_list(atk_list):
     for key_ele in glob.settings['process_controller'].keys():
@@ -290,9 +362,9 @@ def clear_not_in_list(atk_list):
 def set_stdstreams():
     f_tmp = open(os.devnull, 'r')
     sys.stdin = f_tmp
-    f_tmp = open(os.devnull, 'r')
+    f_tmp = open(os.devnull, 'w')
     sys.stout = f_tmp
-    f_tmp = open(os.devnull, 'r')
+    f_tmp = open(os.devnull, 'w')
     sys.sterr = f_tmp
 
 def main():
@@ -410,15 +482,9 @@ def main():
             while time_to_wait > 0:
                 time_to_wait = TICK_TIME - (time.time() - last_time)
                 shell_request_manage()
-                if glob.break_wait_time:break
-                sleep(0.1)
-        
-        if glob.break_wait_time:
-            glob.break_wait_time = False
-        else:
-            # Adding SEC_SECONDS seconds
-            for i in reversed(range(1,SEC_SECONDS+1)):
-                log.warning(f'{i} second for starting new round')
-                sleep(1)
+                if glob.break_wait_time:
+                    glob.break_wait_time = False
+                    break
+                sleep(.1)
 
     

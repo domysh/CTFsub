@@ -18,8 +18,6 @@ def not_started():
     else: exit(0)
 
 def getParamethers(line):
-    #if '"' not in line:
-    #    return [f for f in line.split(' ') if f != '']
     res = []
     in_str_mode = False
     last_back = False
@@ -121,103 +119,12 @@ def enable_process(attack_name,set_to=None):
     except:
         print(f'Process controller of {attack_name} attack not founded!')
 
-def whitelist_get_set(attack_name,*ips):
-    attack_ctrl = get_process_controller(attack_name)
-    if attack_ctrl is None: return
-    try:
-        status = attack_ctrl['whitelist_on']
-        if len(ips) == 0:
-            if status != True:
-                print('ALLERT! The whitelist is disabilited')
-            print(f'Whitelist for {attack_name} attack is =',attack_ctrl['whitelist_ip'])
-        else:
-            attack_ctrl['whitelist_ip'] = []
-            if ips[0] != 'no_ip':
-                for ip in ips:
-                    if not utils.fun.is_valid_ip(ip):
-                        print(f'{ip} is not a valid IP address!')
-                        return 
-                    attack_ctrl['whitelist_ip'].append(ip)
-            attack_ctrl['whitelist_on'] = True
-            print('All done :D')
-    except:
-        print(f'Process Controller of {attack_name} damaged !!!')
-
-def blacklist_get_set(attack_name,*ips):
-    attack_ctrl = get_process_controller(attack_name)
-    if attack_ctrl is None: return
-    try:
-        status = attack_ctrl['whitelist_on']
-        if len(ips) == 0:
-            if status != False:
-                print(f'ALLERT! The blacklist is disabilited')
-            print(f'Blacklist for {attack_name} attack is =',attack_ctrl['excluded_ip'])
-        else:
-            attack_ctrl['excluded_ip'] = []
-            if ips[0] != 'no_ip':
-                for ip in ips:
-                    if not utils.fun.is_valid_ip(ip):
-                        print(f'{ip} is not a valid IP address!')
-                        return 
-                    attack_ctrl['excluded_ip'].append(ip)
-            attack_ctrl['whitelist_on'] = False
-            print('All done :D')
-    except:
-        print(f'Process Controller of {attack_name} damaged !!!')
-            
-def disable_filters(attack_name):
-    return blacklist_get_set(attack_name,'no_ip') 
-
 def get_process_controller(attack_name):
     try:
         return glob.settings['process_controller'][attack_name]
     except:
         print(f'Process Controller not found for {attack_name}')
         return None
-
-def get_filter_status(attack_name):
-    attack_ctrl = get_process_controller(attack_name)
-    if attack_ctrl is None: return
-    try:
-        if attack_ctrl['whitelist_on']:
-            print('Now is active the Whitelist')
-            print(f'Here the IPs whitelisted: {attack_ctrl["whitelist_ip"]}') 
-        else:
-            array_ip = attack_ctrl["excluded_ip"]
-            if len(array_ip) == 0:
-                print('Filters are disabilited!')
-            else:
-                print('Now is active the Blacklist')
-                print(f'Here the IPs blacklisted: {array_ip}') 
-    except:
-        print(f'Process controller of {attack_name} attack not founded!')
-
-def get_set_timeout(attack_name,time = None):
-    attack_ctrl = get_process_controller(attack_name)
-    if attack_ctrl is None: return
-    try:
-        if time is None:
-            res = attack_ctrl['timeout']
-            if res is None:
-                print('No timeout setted, using global timeout')
-            elif type(res) in (int,float):
-                print(f'Timeout setted to {int(res//60)}:{int(res%60)}')
-            else:
-                print('Error to read timeout')
-        else:
-            if time == 'no_time':
-                attack_ctrl['timeout'] = None
-                print('Timeout disabilited! using global timeout')
-            else:
-                try:time = int(time)
-                except:
-                    try:time = float(time)
-                    except:pass
-                if type(time) in (int,float):
-                    attack_ctrl['timeout'] = time
-                    print(f'Timeout changed to {int(time//60)}:{int(time%60)}')
-    except:
-        print(f'Process controller of {attack_name} attack not founded!')
 
 def on_off_status_autoblacklist(attack_name,ip,on_or_off = None):
     blacklist_status = None
@@ -240,46 +147,6 @@ def on_off_status_autoblacklist(attack_name,ip,on_or_off = None):
             print('Status Updated')
     except:
         print('Error reading autoblacklist settings')
-
-def on_off_status_alivectrl(attack_name,port = None):
-    attack_ctrl = get_process_controller(attack_name)
-    if attack_ctrl is None: return
-    try:
-        if port is None:
-            res = attack_ctrl['alive_ctrl']
-            if res is None:
-                print('Attack Active Control is disabilited')
-            else:
-                print(f'Port setted for Active Control is {res}')
-        else:
-            if port == 'disable':
-                attack_ctrl['alive_ctrl'] = None
-                print('Attack Active Control have been disabilited for this attack')
-            else:
-                try:
-                    port = int(port)
-                    if port > 65535  or port < 1:raise Exception()
-                    attack_ctrl['alive_ctrl'] = port
-                    print('Active Control for attack setted correctly on the port indicated')
-                except:
-                    print('Invalid port')
-    except:
-        print('Error reading autoblacklist settings')
-
-def get_attack_status(attack_name):
-    print_div()
-    attack_ctrl = get_process_controller(attack_name)
-    if attack_ctrl is None: return
-    print(f'Name of the attack: {attack_name}')
-    print_div()
-    enable_process(attack_name)
-    print('FILTERS:')
-    get_filter_status(attack_name)
-    print('TIMEOUT:')
-    get_set_timeout(attack_name)
-    print('ACTIVE CONTROL:')
-    on_off_status_alivectrl(attack_name)
-    print_div()
 
 def tail_log():
     Tail(utils.config.GLOBAL_LOG_FILE).follow(10,0.3)
@@ -487,27 +354,6 @@ class CTFsubShell(cmd.Cmd):
                     'set':{'onoff::on_or_off':[enable_process]},
                     'status':[enable_process]
                 },
-                'filter':{
-                    'whitelist':{
-                        'set':{'ip_array::list_all_ip':[whitelist_get_set]},
-                        'get':[whitelist_get_set]
-                    },
-                    'blacklist':{
-                        'set':{'ip_array::list_all_ip':[blacklist_get_set]},
-                        'get':[blacklist_get_set]
-                    },
-                    'disable':[disable_filters],
-                    'status':[get_filter_status]
-
-                },
-                'status':[get_attack_status],
-                'timeout':{
-                    'disable':[get_set_timeout,('no_time',)],
-                    'set':{
-                        'num::time_in_seconds':[get_set_timeout]
-                        }, 
-                    'status':[get_set_timeout]
-                },
                 'autoblacklist':{
                     'ip::':{
                         'set':{
@@ -515,13 +361,6 @@ class CTFsubShell(cmd.Cmd):
                         }, 
                         'status':[on_off_status_autoblacklist] 
                     }
-                },
-                'alive-ctrl':{
-                    'on':{
-                        'intnum::port':[on_off_status_alivectrl] 
-                    },
-                    'off':[on_off_status_alivectrl,('disable',)], 
-                    'status':[on_off_status_alivectrl] 
                 }
 
             }

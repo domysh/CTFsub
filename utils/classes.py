@@ -63,6 +63,9 @@ class Attacker():
 class AttackFailed(Exception):pass         #Use when the vuln is closed
 class AttackRequestRefused(Exception):pass #Use when the connection to the server is impossible
 
+class WrongFlagSubmit(Exception):pass
+class FlagSubmitFailed(Exception):pass
+
 class LogStream(object):
     def __init__(self,log_obj,lvl=logging.INFO):
         self.log_obj = log_obj

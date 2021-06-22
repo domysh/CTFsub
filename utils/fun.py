@@ -110,6 +110,15 @@ def db_init():
     db.commit()
     db.close()
 
+def is_duplicated(flag:bytes):
+    db = sqlite3.connect(utils.config.DB_NAME)
+    cur = db.cursor()
+    cur.execute("SELECT flag FROM flags WHERE flag = ?",[flag])
+    duplicated = True if len(cur.fetchall()) > 0 else False
+    cur.close()
+    db.close()
+    return duplicated
+
 def insert_flag(flag:bytes):
     db = sqlite3.connect(utils.config.DB_NAME)
     cur = db.cursor()

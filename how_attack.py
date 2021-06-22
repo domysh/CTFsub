@@ -27,6 +27,12 @@ TIMEOUT = None #Every instace of the attack have a timeout setted in configs
 #WHITELIST = ['127.0.0.1'] # Only this list of IP will be attacked
 
 
+#Set a custom flag regex for this attack
+#You can use the global configuration not defining this variable
+#Instead set FLAG_REGEX
+#FLAG_REGEX = None # This will deactivate the regex filter for this attack... you must return just filtered flags
+#FLAG_REGEX = "flg\\{[A-Za-z]{10}\\}" # set a different regex to use for this attack 
+
 # Special Exceptions to use
 # 1. raise AttackFailed() -> say to CTFsub that the vuln is closed
 # 2. raise AttackRequestRefused() -> say to CTFsub that the service is not responding
