@@ -1,4 +1,4 @@
-<img title="" src="./logo.png" alt="" width="588" data-align="center">
+<img title="" src="./logo.png" data-align="center">
 
 # CTFsub, a submitter and attacker for CTFs
 
