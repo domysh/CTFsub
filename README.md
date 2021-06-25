@@ -7,7 +7,7 @@
 CTFsub now have another face, and will be easy to use and comfortable
 **This new version of CTFsub is still in development, so it's not usable yet.**
 
-#### Some screenshots
+## Some screenshots
 
 The first view of the web interface
 
