@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+    webserver:
+        restart: unless-stopped
+        build: ./webserver/
+        volumes:
+            - ./webserver/execute:/execute
+        ports:
+            - 5050:9999
+    attacker:
+        restart: unless-stopped
+        build: ./attacker/
+        volumes:
+            - ./attacker/execute:/execute
+    flag-sub:
+        restart: unless-stopped
+        build: ./flag_sub/
+        volumes:
+            - ./flag_sub/execute:/execute
+    mongo:
+        image: mongo
+        restart: unless-stopped
+        volumes:
+            - ./mongodbdata:/data/db
+        ports: #Only for test
+            - 27017:27017

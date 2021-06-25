@@ -1,0 +1,27 @@
+{% extends "fullwidth.html" %}
+
+
+{% block main %}
+<script src="/static/js/init-funcs.js"></script>
+
+<div style="margin-left: 20px;width: 80%; padding-top: 20px;">
+    <h1>Teams' IPs</h1>
+    <p>Set the list of IP to attack during the race</p>
+</div>
+<div>
+    
+</div>
+
+<script>
+
+</script>
+{% endblock %}
+
+{% block footer %}
+    <a type="button" onclick="request_back()" class="btn btn-danger">
+        <i class="fas fa-angle-double-left"></i> Back
+    </a>
+    <a type="button" onclick="send_team_list()" class="btn btn-danger">
+        Next <i class="fas fa-angle-double-right"></i>
+    </a>
+{% endblock %}

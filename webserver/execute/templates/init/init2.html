@@ -1,0 +1,424 @@
+{% extends "fullwidth.html" %}
+
+
+{% block main %}
+<script src="/static/js/init-funcs.js"></script>
+
+<style>
+.ip-writer{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.ip-byte-text{
+    width:70px;
+    margin: 0 3px;
+    text-align: right;
+    font-weight: bolder;
+}
+.ip-dot{
+    font-size: 200%;
+}
+
+</style>
+<div style="margin-left: 20px;width: 80%; padding-top: 20px;">
+    <h1>Teams' IPs</h1>
+    <p>Set the list of IP to attack during the race</p>
+</div>
+<div>
+
+    <div>
+ 
+        <br>
+        <h5 class="text-center">Generate the IP list with IP ranges</h5>
+        <div class="row g-0 align-items-center justify-content-center">
+            <div class="ip-writer col-12">                
+                <div id="ip-byte-1"><input type="text" onkeyup="ip_composed_ctrl(1)" placeholder="10" class="ip-byte-text form-control" /></div>
+                <span class="ip-dot">.</span>
+                <div id="ip-byte-2"><input type="text" onkeyup="ip_composed_ctrl(2)" placeholder="1" class="ip-byte-text form-control" /></div>
+                <span class="ip-dot">.</span>
+                <div id="ip-byte-3"><input type="text" onkeyup="ip_composed_ctrl(3)" placeholder="1" class="ip-byte-text form-control" /></div>
+                <span class="ip-dot">.</span>
+                <div id="ip-byte-4"><input type="text" onkeyup="ip_composed_ctrl(4)" placeholder="1-10" class="ip-byte-text form-control" /></div>
+                <i class="fas fa-question" style="font-size:150%;margin:5px;color: var(--third);" onclick="how_ip_range_works()"></i>
+            </div>
+            <div class="col-12" style="margin: 10px 0;"></div>
+            <input id="team-ip" class="col-12 form-control" onkeyup="ip_ctrl()" type="text" style="width: 180px;font-weight: bold; text-align: center;" placeholder="Ip to exclude" />
+            
+            <div class="col-12" style="margin: 30px 0;">
+                <h3 class="text-center">OR</h3>
+            </div>
+            <div id="ip-upload-list" class="col-12 text-center">
+                    <h6>Send me the list of teams in a json format</h6>
+                    <input id="config-upload" type="file" hidden/>
+                    <label class="btn btn-primary" id="upload-btn" for="config-upload">Choose file</label>
+                    &nbsp;
+                    <i class="fas fa-upload" onclick="upload_config()" style="color: var(--fifth);font-size:150%"
+                     data-bs-toggle="tooltip" data-bs-placement="top" title="Upload the configuration"></i>
+                    <br >
+            </div>
+        </div>
+        
+
+    </div>
+    
+</div>
+<div style="margin-top: 70px;"></div>
+<h4><u>How the json file have to be composed?</u></h4>
+<h6>Choose one method:</h6>
+<div class="accordion accordion-flush" id="accordionFlushExample" style="max-width: 70%;width: 70%;">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingOne">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+          1. List of teams
+        </button>
+      </h2>
+      <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">Send me only the list of the teams, names will be auto generated and you could change them during the execution of CTFsub<br />Json file example:<pre>
+<code class="language-json">    [
+        "10.1.1.1",
+        "10.1.1.2",
+        "10.1.1.3",
+        "10.1.1.4",
+        "10.1.1.5",
+        "10.1.1.6",
+        "162.34.2.89"
+    ]</code>
+</pre></div>
+      </div>
+    </div>
+    
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+          2. List with team name and ip (As a List of Objects)
+        </button>
+      </h2>
+      <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">Send me a list of objects containing the name and the ip of the team<br>Json file example (duplicated name will be changed):<pre>
+<code class="language-json">    [
+        {
+            "name": "team_1",
+            "ip": "10.1.1.1"
+        },
+        {
+            "name": "team_2",
+            "ip": "10.1.1.2"
+        },
+        {
+            "name": "team_3",
+            "ip": "162.34.2.89"
+        }
+    ]</code>
+</pre></div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingThree">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+            3. List with team name and ip (As an Object)
+        </button>
+      </h2>
+      <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">Send me an object containing a key for every team, the key is the team name and the value is the ip associated<br>Json file example:<pre>
+<code class="language-json">    {
+        "team_1": "10.1.1.1",
+        "team_2": "10.1.1.2",
+        "team_3": "162.34.2.89"
+    }</code>
+</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    
+    function how_ip_range_works(){
+        show_message("How IP range works 💡",
+    `
+    <b>With ip range you can generate the teams' ip list easily and fast.</b>
+    <br>
+    <p>
+        For generate the list of ip you can insert in every field the number,
+        or a range of numbers like: '1-20'. You can insert at maximum 2 range in the ip. The real IP list
+        will be generated automaticaly. If this method is not efficent for your race, you should
+        not chose this method and upload a teams' ip list.<br>
+        <span style="color: var(--third);">Remember to insert your team's IP as the IP to exclude for avoid to attack yourserlf!</span>
+    </p>
+    For instance:
+    <br>
+    <div class="ip-writer col-10">
+        <div id="ip-byte-1"><input type="text" class="ip-byte-text form-control" value="10" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-2"><input type="text" class="ip-byte-text form-control" value="1" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-3"><input type="text" class="ip-byte-text form-control" value="1" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-4"><input type="text" class="ip-byte-text form-control" value="1-10" readonly/></div>
+    </div>
+    will generate this list of IPs:<br>
+    <pre><code class="language-json">[ "10.1.1.1", "10.1.1.2", "10.1.1.3", "10.1.1.4", 
+    "10.1.1.5", "10.1.1.6", "10.1.1.7", "10.1.1.8", 
+    "10.1.1.9", "10.1.1.10" ]</code></pre>
+    <br>
+    OR
+    <br>
+    <div class="ip-writer col-10">
+        <div id="ip-byte-1"><input type="text" class="ip-byte-text form-control" value="10" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-2"><input type="text" class="ip-byte-text form-control" value="1" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-3"><input type="text" class="ip-byte-text form-control" value="1-3" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-4"><input type="text" class="ip-byte-text form-control" value="1-2" readonly/></div>
+    </div>
+    will generate this list of IPs:<br>
+    <pre><code class="language-json">[ "10.1.1.1", "10.1.1.2", "10.1.2.1", 
+    "10.1.2.2", "10.1.3.1", "10.1.3.2" ]</code></pre>
+    <br>
+    OR
+    <br>
+    <div class="ip-writer col-10">
+        <div id="ip-byte-1"><input type="text" class="ip-byte-text form-control" value="10" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-2"><input type="text" class="ip-byte-text form-control" value="1" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-3"><input type="text" class="ip-byte-text form-control" value="1" readonly/></div>
+        <span class="ip-dot">.</span>
+        <div id="ip-byte-4"><input type="text" class="ip-byte-text form-control" value="1" readonly/></div>
+    </div>
+    will generate this list of IPs:<br>
+    <pre><code class="language-json">[ "10.1.1.1" ]</code></pre>
+    <br>
+    `
+    ,false)
+    }
+    
+    document.getElementById('config-upload').addEventListener('change', function(){
+        const fileChosen = document.getElementById('upload-btn');
+        if (this.files.length <= 0){
+            fileChosen.textContent = "Choose file"
+            fileChosen.style = ""
+        }else{
+            fileChosen.textContent = this.files[0].name
+            fileChosen.style["font-weight"] = "bold"
+            fileChosen.style.color = "var(--done)"
+        }
+    })
+
+    function ip_composed_ctrl(n){
+        let input_to_check = document.querySelector(`#ip-byte-${n} input`)
+        let text = input_to_check.value
+        let new_text = ""
+        let pass_to_next = null
+        let line_count = 0
+        for(let i=0;i<text.length;i++){
+            if (is_numeric(text[i])){
+                new_text+=text[i]
+            }else if(text[i] == "-"){
+                if(line_count == 0){
+                    line_count++
+                    new_text+="-"
+                }
+            }else if(text[i] == "."){
+                pass_to_next = i
+                break
+            }
+        }
+        input_to_check.value = new_text
+        if (pass_to_next != null && n != 4){
+            let next_input = document.querySelector(`#ip-byte-${n+1} input`)
+            next_input.focus()
+            if (pass_to_next < text.length){
+                next_input.value = text.substring(pass_to_next+1,text.length)+next_input.value
+            }
+            ip_composed_ctrl(n+1)
+        }
+    }
+
+    function ip_ctrl(){
+        let input_to_check = document.getElementById("team-ip")
+        let new_text = ""
+        let text = input_to_check.value
+        let dot_counter = 0
+        for(let i=0;i<text.length;i++){
+            if(is_numeric(text[i])){
+                new_text += text[i]
+            }else if (text[i] == "." && dot_counter < 3){
+                new_text += text[i]
+                dot_counter++
+            }
+        }
+        input_to_check.value = new_text
+    }
+    
+    async function upload_config() {
+        let files = document.getElementById("config-upload").files
+        if (files.length <= 0){
+            show_error("You have to upload a json file!")
+            return
+        }else{
+            let data = null
+            try{
+                let json_text = await files[0].text()
+                data = JSON.parse(json_text)
+            }catch(err){
+                show_error("The file choosen is not a json file!")
+                return;
+            }
+            let res = {}
+            if (Array.isArray(data)){
+                if (data.length <= 0){
+                    show_error("Insert at least 1 IP in the list!")
+                    return
+                }
+                for(let i=0;i<data.length;i++){
+                    if (isDict(data[i])){
+                        try{
+                            if (!validIPaddress(data[i].ip)){
+                                show_error("Not valid format sended! (Found an invalid IP) Read the instruction about the possible configurations of the json file")
+                                return
+                            }else{
+                                while(true){
+                                    if(data[i].name in res){
+                                        data[i].name += "_"
+                                    }else{
+                                        res[data[i].name] = data[i].ip
+                                        break
+                                    }
+                                }
+                            }
+                        }catch(err){
+                            show_error("Not valid format sended! (Found an invalid syntax) Read the instruction about the possible configurations of the json file")
+                            return
+                        }
+                    }else{
+                        if (!validIPaddress(data[i])){
+                            show_error("Not valid format sended! (Found an invalid IP) Read the instruction about the possible configurations of the json file")
+                            return
+                        }else{
+                            let name = `team_${i+1}`
+                            while(true){
+                                if(name in res){
+                                    name += "_"
+                                }else{
+                                    res[name] = data[i]
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+            }else if (isDict(data)){
+                var keys = Object.keys(data);
+                for(let i=0;i<keys.length;i++){
+                    if (!validIPaddress(data[keys[i]])){
+                        show_error("Not valid format sended! (Found an invalid IP) Read the instruction about the possible configurations of the json file")
+                        return
+                    }
+                }
+                res = data
+            }else{
+                show_error("Not valid json sended! Read the instruction about the possible configurations of the json file")
+                return
+            }
+            request_next(res)
+        }
+    }
+    function send_team_list(){
+        let ip_bytes = ["","","",""]
+        ip_bytes[0] = document.querySelector("#ip-byte-1 input").value
+        ip_bytes[1] = document.querySelector("#ip-byte-2 input").value
+        ip_bytes[2] = document.querySelector("#ip-byte-3 input").value
+        ip_bytes[3] = document.querySelector("#ip-byte-4 input").value
+    
+        let ip_to_skip = document.getElementById("team-ip").value.replace(" ","")
+
+        let range_counter = 0
+        for(let i=0;i<ip_bytes.length;i++){
+            if (ip_bytes[i] == ""){
+                show_error("For go to next step, you have to select a range or upload a list of IP")
+                return
+            }
+            if (ip_bytes[i].includes("-")){
+                let range = ip_bytes[i].replace(" ","").split("-")
+                if (range.length != 2){
+                    show_error("Invalid IP range (A range have to be written in this way: '[from]-[to]', example: '30-72')")
+                    return
+                }
+                if (isNaN(parseInt(range[0])) || isNaN(parseInt(range[1]))){
+                    show_error("Invalid IP range (A range have to be written in this way: '[from]-[to]', example: '30-72')")
+                    return
+                }
+                range[0] = parseInt(range[0])
+                range[1] = parseInt(range[1])
+                if (range[0] >= range[1]){
+                    show_error("Invalid IP range (A range have to be written in this way: '[from]-[to]', example: '30-72') P.S. [from] have to be < of [to]")
+                    return
+                }
+
+                if (range[0] < 0 || range[0] > 255 || range[1] < 0 || range[1] > 255){
+                    show_error("Invalid IP range (A range have to be written in this way: '[from]-[to]', example: '30-72') P.S. [from] and [to] have to be >= 0 and <= 255")
+                    return
+                }
+                ip_bytes[i] = range
+                range_counter++
+            }else{
+                if (!isNaN(parseInt(ip_bytes[i]))){
+                    ip_bytes[i] = parseInt(ip_bytes[i])
+                    if (ip_bytes[i] < 0 || ip_bytes[i] > 255){
+                        show_error("Invalid IP range (You can insert only numbers valid for an IPv4 [0 <= byte <= 255])")
+                        return
+                    }
+                }else{
+                    show_error("Invalid IP range (You can insert only numbers or ranges in text fields!)")
+                    return
+                }
+            }
+        }
+        if (range_counter > 2){
+            show_error("Invalid IP range (You can use at maximum 2 ranges)")
+            return;
+        }
+        if (ip_to_skip != "" &&!validIPaddress(ip_to_skip)){
+            show_error("Insert a valid ip to skip (You team IP)")
+            return
+        }
+
+        let ret = {}
+        let counter = 0
+
+        function generate_ips(pref,ip_b){
+            if (ip_b.length <= 0){
+                pref = pref.substring(0,pref.length-1)
+                
+                if (validIPaddress(pref) && pref != ip_to_skip){
+                    ret[`team_${counter}`] = pref
+                    counter++
+                }
+                return
+            }
+            if(typeof ip_b[0] == 'number'){
+                generate_ips(`${pref}${ip_b[0]}.`,ip_b.slice(1))
+            }else{
+                for(let i=ip_b[0][0];i<=ip_b[0][1];i++){
+                    generate_ips(`${pref}${i}.`,ip_b.slice(1))
+                }
+            }
+        }
+        generate_ips("",ip_bytes)
+        request_next(ret)
+    }
+    </script>
+{% endblock %}
+
+{% block footer %}
+    <a type="button" onclick="request_back()" class="btn btn-danger">
+        <i class="fas fa-angle-double-left"></i> Back
+    </a>
+    <a type="button" onclick="send_team_list()" class="btn btn-danger">
+        Next <i class="fas fa-angle-double-right"></i>
+    </a>
+{% endblock %}

@@ -1,0 +1,139 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+:root {
+    --first: #f9f8f3;
+    --second: #273c47;
+    --third: #fb5555;
+    --fourth: #df1833;
+    --fifth: #3fa997;
+    --text: #FFF;
+    --sub-text: #9B9B9B;
+    --done: #3bc53b;
+}
+
+html {
+    margin: 0;
+    border: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+body {
+    margin: 0;
+    background: var(--first);
+    color: var(--text);
+}
+
+main {
+    min-height: calc(100vh - 150px);
+}
+
+nav {
+    height: 100px;
+    background: var(--second);
+}
+
+img {
+    display: block;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+* {
+    font-family: 'Montserrat', sans-serif;
+    z-index: 10;
+}
+
+footer.default {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 60px;
+    font-weight: bold;
+    background: var(--second);
+}
+
+a,
+a:hover {
+    transition: 0.3s;
+    font-weight: bold;
+    -webkit-transition: 0.3s;
+    -moz-transition: 0.3s;
+    -ms-transition: 0.3s;
+    -o-transition: 0.3s;
+}
+
+a {
+    color: var(--text);
+}
+
+a:hover {
+    color: var(--fifth);
+}
+
+.logo-nav {
+    max-height: 100px;
+}
+
+.centered-flex {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.centered-flex.flex-rows {
+    flex-direction: column;
+}
+
+.subtitle-text {
+    text-decoration: none;
+    text-align: center;
+    font-weight: bold;
+    color: var(--fourth);
+    font-size: 200%;
+}
+
+.transition-fade {
+    transition: 0.4s;
+    opacity: 1;
+}
+
+html.is-animating .transition-fade {
+    opacity: 0;
+}
+
+[onclick],
+[onClick] {
+    cursor: pointer;
+}
+
+.accordion-button,
+.accordion-button:focus{
+    background: var(--second) !important;
+    border-bottom: 2px solid var(--fifth);
+}
+.accordion-button.collapsed
+.accordion-button.collapsed:focus{
+    background: var(--second);
+    border:none !important;
+}
+.accordion-button:focus,
+.accordion-button{
+    color: var(--text) !important;
+}
+.accordion-item{
+    border:none;
+}
+.accordion-item:focus{
+    outline: none;
+}
+.accordion-body,
+.accordion-body code{
+    background: var(--second);
+}
+.accordion-button:focus {
+    box-shadow: none;
+}
