@@ -1,20 +1,182 @@
 {% extends "fullwidth.html" %}
 
-
 {% block main %}
 <script src="/static/js/init-funcs.js"></script>
+<style>
+    #code-editor{
+        width: 70vw;
+        height: 60vh;
+    }
+    #code-editor .monaco-editor{
+        width: 70vw !important;
+        height: 60vh !important;
+    }
 
+    .margin-around{
+        margin: 5px;
+    }
+</style>
 <div style="margin-left: 20px;width: 80%; padding-top: 20px;">
-    <h1>Teams' IPs</h1>
-    <p>Set the list of IP to attack during the race</p>
+    <h1>Flag Submit</h1>
+    <p>Write you code and choose your settings for the flag submiter</p>
 </div>
+<div class="browser">
+    <div class="browser-navigation-bar">
+        <i onclick="useless_function()"></i>
+        <i onclick="useless_function()"></i>
+        <i onclick="useless_function()"></i>
+        <!-- Place your URL into <input> below -->
+        <input value="Python code editor - Flag submit" disabled/>
+        <i class="fas fa-times" onclick="reset_text()"></i>
+        <i class="fas fa-redo-alt" onclick="reload_text()" aria-hidden="true"></i>
+    </div>
+
+    <div class="browser-container">
+        <div id="code-editor"></div>  
+    </div>
+</div><br>
 <div>
-    
+    <div style="margin-top: 30px;"></div>
+    <div class="flex-row">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">Flag Regex</span>
+            <input type="text" class="form-control" placeholder="flg\{[A-Za-z0-9]{25}\}">
+        </div>
+        <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
+    </div>
+    <div style="margin-top: 10px;"></div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="duplicated-flags">
+        <label class="form-check-label" for="duplicated-flags">
+            <b>Send Duplicated Flags</b>
+        </label>
+    </div>
+    <div style="margin-top: 30px;"></div>
+    <div class="form-check form-switch">
+        <label class="custom-control-label" for="customSwitch1">
+            <div class="flex-row">
+                Enable temporised flag submit 
+                <i class="fas fa-question question-btn" onclick="how_temporised_flag_submit_works()"></i>
+            </div>
+        </label>
+        <input type="checkbox" onchange="temporised_submit_change()" class="form-check-input" id="temporised-flags">
+    </div>
+    <div class="row g-0 align-item-center justify-content-center">
+        <div class="col-12 col-sm-6 margin-around">
+            <div class="input-group flex-nowrap">
+                <span class="input-group-text">Submit time range</span>
+                <input type="number" class="form-control" step="0.1" min="0.1" placeholder="1.5" id="submit-time-range">
+                <span class="input-group-text">sec</span>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 margin-around">
+            <div class="col-6 col-sm-6 input-group flex-nowrap">
+                <span class="input-group-text">No. of attack in a time range</span>
+                <input type="number" class="form-control" step="1" min="1" placeholder="1" id="attacks-in-a-range">
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 
+function how_flag_regex_works(){
+    show_message("How Flag Regex Works 💡",
+`TESTO ESPLICATIVO`
+,false)
+}
+
+function how_temporised_flag_submit_works(){
+    show_message("How temporised flag submit works 💡",
+`TESTO ESPLICATIVO`
+,false)
+}
+
+function temporised_submit_change(){
+    let status = document.getElementById("temporised-flags").checked
+    console.log("NOT IMPLEMENTED")
+}
+
+function get_default_text(){
+let def = `"""
+Insert here the code for submit the flag
+in this code there is just defined the FLAG variable that contain the flag to submit.
+[ if you enable multiple flag submit, FLAG variable will be an array of flags ]
+
+Manage also the status of the submit with the variable STATUS (assigned to SUCCESS by default)
+Possible states to assign: SUCCESS, FAILED, INVALID
+"""
+#Example of implementation:
+import requests
+try:
+    status = requests.post("https://gameserver.com/api/flag_submit", 
+                    data={
+                        "flag":FLAG,
+                        "team_id":"this_is_a_team_id"
+                    }, timeout=3
+    ).status_code
+    if status != 200:
+        if status == 429:
+            STATUS = FAILED #Too many requests to game server
+        elif status == 400:
+            STATUS = INVALID #The flag submitted is not a valid flag
+    
+except requests.exceptions.Timeout: #Probably the gameserver isn't up
+    STATUS = FAILED
+`
+return def
+}
+
+async function get_setted_text(){
+    let res = get_default_text()
+    await fetch("/api/flag-submit-code/get")
+        .then( r => r.json() )
+        .then( r => {
+            if(r.status){
+                res = r.data
+            }
+        })
+    return res
+}
+
+function init_monaco_editor(){
+
+require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.25.2/min/vs' } });
+    require(['vs/editor/editor.main'], async function () {
+            window.editor = monaco.editor.create(document.getElementById('code-editor'), {
+            value: await get_setted_text(),
+            language: 'python',
+            automaticLayout: true,
+            minimap: {
+                enabled: false
+            }
+        });
+        fetch('/static/monaco-themes/Monokai.json')
+            .then(data => data.json())
+            .then(data => {
+            monaco.editor.defineTheme('monokai', data);
+            monaco.editor.setTheme('monokai');
+        })
+        
+    });
+}
+
+function reset_text(){
+    window.editor.setValue(get_default_text())
+}
+
+async function reload_text(){
+    window.editor.setValue(await get_setted_text())
+}
+
+function useless_function(){
+    show_message("Useless","I'm useless!")
+}
+
+init_monaco_editor()
+    
 </script>
+
 {% endblock %}
 
 {% block footer %}

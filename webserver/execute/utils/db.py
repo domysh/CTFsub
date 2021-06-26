@@ -30,13 +30,18 @@ def updateInitState(i):
     conn.close()
 
 def getInitState():
-    conn = MongoClient(MONGO_URL)
-    data = conn.main.static.find_one({"id":"settings"})
-    conn.close()
+    data = get_settings()
     if "state" in data:
         return data["state"]
     else:
         return 0
+
+def get_flag_submit_code():
+    data = get_settings()
+    if "submit_code" in data:
+        return data["submit_code"]
+    else:
+        return False
 
 def init_teams(teams:dict):
     req = []

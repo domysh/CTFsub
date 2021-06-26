@@ -1,6 +1,7 @@
 from flask import Blueprint, redirect, request, jsonify, make_response
 import conf
-from utils.db import getInitState, updateInitState, init_teams
+from utils.db import (getInitState, updateInitState,
+                        init_teams, get_flag_submit_code)
 app = Blueprint('init', __name__)
 
 @app.route("/next", methods=["GET","POST"])
@@ -27,7 +28,6 @@ def prev_state():
             return redirect(f"/init/{state-1}")
     else:
         return redirect("/")
-
 
 def create_json_response(data,state):
     if data is None:

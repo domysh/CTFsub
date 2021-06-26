@@ -1,6 +1,6 @@
 <img title="" src="./logo.png" data-align="center">
 
-# CTFsub, a submitter and attacker for CTFs
+# A flag submitter and attacker for CTFs A/D
 
 ---
 
