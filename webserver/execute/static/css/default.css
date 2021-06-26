@@ -103,6 +103,11 @@ a:hover {
     align-items: center;
 }
 
+.flex-center{
+    align-items: center;
+    justify-content: center;
+}
+
 .question-btn{
     font-size:150%;
     margin:5px;
@@ -119,13 +124,14 @@ html.is-animating .transition-fade {
 }
 
 .accordion-button,
+.accordion-header,
 .accordion-button:focus{
     background: var(--second) !important;
     border-bottom: 2px solid var(--fifth);
 }
-.accordion-button.collapsed
+.accordion-button.collapsed,
 .accordion-button.collapsed:focus{
-    background: var(--second);
+    background: var(--second) !important;
     border:none !important;
 }
 .accordion-button:focus,
