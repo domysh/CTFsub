@@ -1,0 +1,145 @@
+{% extends "fullwidth.html" %}
+
+
+{% block main %}
+<script src="/static/js/init-funcs.js"></script>
+
+<style>
+.ip-writer{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.ip-byte-text{
+    width:70px;
+    margin: 0 3px;
+    text-align: right;
+    font-weight: bolder;
+}
+.ip-dot{
+    font-size: 200%;
+}
+
+</style>
+<div style="margin-left: 20px;width: 80%; padding-top: 20px;">
+    <h1>Teams' IPs</h1>
+    <p>Set the list of IP to attack during the race</p>
+</div>
+<div>
+
+    <div>
+ 
+        <br>
+        <h5 class="text-center">Generate the IP list with IP ranges</h5>
+        <div class="row g-0 align-items-center justify-content-center">
+            <div class="ip-writer col-12">                
+                <div id="ip-byte-1"><input type="text" onkeyup="ip_composed_ctrl(1)" placeholder="10" class="ip-byte-text form-control" /></div>
+                <span class="ip-dot">.</span>
+                <div id="ip-byte-2"><input type="text" onkeyup="ip_composed_ctrl(2)" placeholder="1" class="ip-byte-text form-control" /></div>
+                <span class="ip-dot">.</span>
+                <div id="ip-byte-3"><input type="text" onkeyup="ip_composed_ctrl(3)" placeholder="1" class="ip-byte-text form-control" /></div>
+                <span class="ip-dot">.</span>
+                <div id="ip-byte-4"><input type="text" onkeyup="ip_composed_ctrl(4)" placeholder="1-10" class="ip-byte-text form-control" /></div>
+                <i class="fas fa-question question-btn" onclick="how_ip_range_works()"></i>
+            </div>
+            <div class="col-12" style="margin: 10px 0;"></div>
+            <input id="team-ip" class="col-12 form-control" onkeyup="ip_ctrl()" type="text" style="width: 180px;font-weight: bold; text-align: center;" placeholder="Ip to exclude" />
+            
+            <div class="col-12" style="margin: 30px 0;">
+                <h3 class="text-center">OR</h3>
+            </div>
+            <div id="ip-upload-list" class="col-12 text-center">
+                    <h6>Send me the list of teams in a json format</h6>
+                    <input id="config-upload" type="file" hidden/>
+                    <label class="btn btn-primary" id="upload-btn" for="config-upload">Choose file</label>
+                    &nbsp;
+                    <i class="fas fa-upload" onclick="upload_config()" style="color: var(--fifth);font-size:150%"
+                     data-bs-toggle="tooltip" data-bs-placement="top" title="Upload the configuration"></i>
+                    <br >
+            </div>
+        </div>
+        
+
+    </div>
+    
+</div>
+<div style="margin-top: 70px;"></div>
+<h4><u>How the json file have to be composed?</u></h4>
+<h6>Choose one method:</h6>
+<div class="accordion accordion-flush" id="accordionFlushExample" style="max-width: 70%;width: 70%;">
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingOne">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+          1. List of teams
+        </button>
+      </h2>
+      <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">Send me only the list of the teams, names will be auto generated and you could change them during the execution of CTFsub<br />Json file example:<pre>
+<code class="language-json">    [
+        "10.1.1.1",
+        "10.1.1.2",
+        "10.1.1.3",
+        "10.1.1.4",
+        "10.1.1.5",
+        "10.1.1.6",
+        "162.34.2.89"
+    ]</code>
+</pre></div>
+      </div>
+    </div>
+    
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+          2. List with team name and ip (As a List of Objects)
+        </button>
+      </h2>
+      <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">Send me a list of objects containing the name and the ip of the team<br>Json file example (duplicated name will be changed):<pre>
+<code class="language-json">    [
+        {
+            "name": "team_1",
+            "ip": "10.1.1.1"
+        },
+        {
+            "name": "team_2",
+            "ip": "10.1.1.2"
+        },
+        {
+            "name": "team_3",
+            "ip": "162.34.2.89"
+        }
+    ]</code>
+</pre></div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="flush-headingThree">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
+            3. List with team name and ip (As an Object)
+        </button>
+      </h2>
+      <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+        <div class="accordion-body">Send me an object containing a key for every team, the key is the team name and the value is the ip associated<br>Json file example:<pre>
+<code class="language-json">    {
+        "team_1": "10.1.1.1",
+        "team_2": "10.1.1.2",
+        "team_3": "162.34.2.89"
+    }</code>
+</pre></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/js/init/init2.js"></script>
+{% endblock %}
+
+{% block footer %}
+    <a type="button" onclick="request_back()" class="btn btn-danger">
+        <i class="fas fa-angle-double-left"></i> Back
+    </a>
+    <a type="button" onclick="send_team_list()" class="btn btn-danger">
+        Next <i class="fas fa-angle-double-right"></i>
+    </a>
+{% endblock %}

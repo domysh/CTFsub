@@ -1,0 +1,39 @@
+{% extends "fullwidth.html" %}
+
+
+{% block main %}
+<script src="/static/js/init-funcs.js"></script>
+<div style="margin-bottom: 80px;" class="text-center">
+    <h1>Load Configs</h1>
+    <p>Choose if create new configs or load config generated before</p>
+</div>
+<div class="row g-0 align-items-center justify-content-center">
+    <div class="col-12 center-block text-center">
+        <div>
+            <input id="config-upload" type="file" hidden/>
+            <label class="btn btn-primary" id="upload-btn" for="config-upload">Choose file</label>
+            &nbsp;
+            <i class="fas fa-upload" onclick="upload_config()" style="color: var(--fifth);font-size:150%"
+             data-bs-toggle="tooltip" data-bs-placement="top" title="Upload the configuration"></i>
+            <br >
+        </div>
+    </div>
+    <div class="col-12 center-block text-center" style="font-weight:bolder; margin:30px;">
+        OR
+    </div>
+    <div class="col-12 center-block text-center">
+        <button onclick="request_next({'config_method':'create'})" class="btn btn-warning" >Create a new configuration</button>
+    </div>
+</div>
+
+<script src="/static/js/init/init1.js"></script>
+
+{% endblock %}
+
+
+{% block footer %}
+    <a type="button" onclick="request_back()" class="btn btn-danger">
+        <i class="fas fa-angle-double-left"></i> Back
+    </a>
+    <div></div>
+{% endblock %}

@@ -1,24 +1,23 @@
-FROM python:3-alpine
+FROM python:3-buster
 
-RUN apk update
-RUN apk add --no-cache gcc libc-dev libxslt-dev libxslt\
-     musl-dev linux-headers libc-dev pcre-dev mailcap
+RUN apt update && apt -y install cron supervisor
 
 RUN mkdir /execute
 WORKDIR /execute
-RUN adduser --disabled-password -h /execute execute
 
-RUN chown -R execute:execute /execute && \
-  chmod -R 600 /execute
+#VOLUME /execute/data /execute/media
+RUN echo "* * * * * root /usr/local/bin/python3 /execute/updater.py\n" > /etc/cron.d/task
+RUN chmod 0644 /etc/cron.d/task
+RUN crontab /etc/cron.d/task
 
-COPY ./requirements.txt /execute/
-
+ADD ./requirements.txt /execute/requirements.txt
 RUN pip install --no-cache-dir -r /execute/requirements.txt
 
-COPY ./start.sh /start.sh
+COPY . /execute/
 
-USER execute
+RUN chmod -R 600 /execute && chmod -R u+X /execute
 
-ENTRYPOINT ["/bin/sh", "/start.sh"]
+COPY ./supervisord.conf /etc/supervisor/supervisord.conf
+ENTRYPOINT ["/usr/bin/supervisord"]
 
 EXPOSE 9999
