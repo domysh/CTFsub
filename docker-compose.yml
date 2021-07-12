@@ -17,5 +17,5 @@ services:
         restart: unless-stopped
         volumes:
             - ./mongodbdata:/data/db
-        ports: #Only for test
-            - 127.0.0.1:27017:27017
+        #ports: #Only for test
+        #    - 127.0.0.1:27017:27017

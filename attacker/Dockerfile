@@ -1,6 +1,6 @@
 FROM python:3-buster
 
-RUN apt update && apt -y install supervisor
+RUN apt-get update && apt-get -y install supervisor
 
 RUN mkdir /execute
 WORKDIR /execute
