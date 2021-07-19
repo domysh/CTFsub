@@ -4,16 +4,16 @@
 
 ---
 
-CTFsub now have another face, and will be easy to use and comfortable
+CTFsub now have another face, and will be easy to use and comfortable.
 **This new version of CTFsub is still in development, so it's not usable yet.**
 
 ## Some screenshots
 
-The first view of the web interface
+Flag submit configuration
 
 <img src="./screen0.png">
 
-Config screen - Teams' IPs input
+Teams' IPs configuration
 
 <img title="" src="./screen1.png" alt="">
 

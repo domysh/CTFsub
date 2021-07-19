@@ -53,7 +53,9 @@
             <b>Send Duplicated Flags</b>
         </label>
     </div>
-    <div style="margin-top: 30px;"></div>
+    <div style="margin-top: 10px;"></div>
+    <center><button class="btn btn-success" onclick="run_code_script()" style="min-width: 250px;"><b>TRY TO RUN</b> <i class="fas fa-play" style="margin-left: 20px;"></i></button></center>
+    <div style="margin-top: 10px;"></div>
 
 </div>
 
@@ -81,7 +83,7 @@
                     <span class="input-group-text">sec</span>
                 </div>
                 <div class="input-group flex-nowrap" style="width: 80%; margin: 0 auto;">
-                    <span class="input-group-text">No. of attack in a time range</span>
+                    <span class="input-group-text">No. of submit in a time range</span>
                     <input type="number" class="form-control" step="1" min="1" placeholder="1" id="attacks-in-a-range">
                 </div>
             </div>
@@ -97,11 +99,57 @@
         </button>
       </h2>
       <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-        <div class="accordion-body">Not Implmented Yet</div>
+        <div class="accordion-body">
+
+            <div style="margin-top: 30px;"></div>
+            <div class="form-check form-switch flex-row justify-content-around">
+                <input type="checkbox" onchange="multiple_submit_change()" style="width: 60px;height: 30px;margin-right: 5px;" class="form-check-input mt-0" id="multiple-flags">
+                <h4>Enable multiple flag submit</h4> 
+                <i class="fas fa-question question-btn" onclick="how_multiple_flag_submit_works()"></i>
+            </div>
+            <div style="margin-top: 30px;"></div>
+            <div id="multiple-flag-detail-inputs">
+                <div class="input-group flex-nowrap" style="width: 80%; margin: 0 auto;">
+                    <span class="input-group-text">Max flag to submit per request</span>
+                    <input type="number" class="form-control" step="1" min="1" placeholder="100" id="multiple-flag-max-submit">
+                    <span class="input-group-text">flags</span>
+                </div>
+            </div>
+        </div>
       </div>
     </div>
-  </div>
 
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="flush-headingThree">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseTwo">
+              <b>Flag expire time</b>
+          </button>
+        </h2>
+        <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
+          <div class="accordion-body">
+
+            <div style="margin-top: 30px;"></div>
+            <div class="form-check form-switch flex-row justify-content-around">
+                <input type="checkbox" onchange="flag_expire_change()" style="width: 60px;height: 30px;margin-right: 5px;" class="form-check-input mt-0" id="flag-expire">
+                <h4>Enable flag expire</h4> 
+                <i class="fas fa-question question-btn" onclick="how_flag_expire_works()"></i>
+            </div>
+            <div style="margin-top: 30px;"></div>
+            <div id="flag-expire-detail-inputs">
+                <div class="input-group flex-nowrap" style="width: 80%; margin: 0 auto;">
+                    <span class="input-group-text">Time to expire</span>
+                    <input type="number" class="form-control" step="0.1" min="0.1" placeholder="5.5" id="flag-expire-time">
+                    <span class="input-group-text">mintes</span>
+                </div>
+            </div>
+
+
+
+          </div>
+        </div>
+      </div>
+  </div>
+  
   <script src="/static/js/init/init3.js"></script>
 
 {% endblock %}
