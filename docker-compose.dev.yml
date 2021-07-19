@@ -7,21 +7,27 @@ services:
         ports:
             - 5050:9999
         environment:
-            - DEBUG=0
+            - DEBUG=1
+        volumes:
+            - ./webserver:/execute
         depends_on:
             - mongo
     attacker:
         restart: unless-stopped
         build: ./attacker/
         environment:
-            - DEBUG=0
+            - DEBUG=1
+        volumes:
+            - ./attacker:/execute
         depends_on:
             - mongo
     flag-sub:
         restart: unless-stopped
         build: ./flag_sub/
         environment:
-            - DEBUG=0
+            - DEBUG=1
+        volumes:
+            - ./flag_sub:/execute
         depends_on:
             - mongo
     mongo:
@@ -29,3 +35,5 @@ services:
         restart: unless-stopped
         volumes:
             - ./mongodbdata:/data/db
+        ports: 
+            - 127.0.0.1:27017:27017

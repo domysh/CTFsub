@@ -12,8 +12,7 @@ COPY . /execute/
 COPY ./supervisord.conf /etc/supervisor/supervisord.conf
 
 RUN adduser --disabled-password --home /execute --gecos '' execute
-RUN usermod -a -G root execute
 RUN chown -R execute:root /execute && \
   chmod -R 660 /execute && chmod -R u+X /execute
 
-ENTRYPOINT ["/usr/bin/supervisord"]
+ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

@@ -11,6 +11,6 @@ def start_page(id_init):
     except:
         return redirect("/")
     return render_template(f"init/init{id_init}.html",
-        title="Config",
+        title="Setup",
         description="Inizializzazione CTFsub"
     )
