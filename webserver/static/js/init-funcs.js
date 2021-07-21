@@ -30,9 +30,22 @@ function show_error(text) {
     show_message("Ops... there is an error! ⚠️", text)
 }
 
-function request_back() {
+function request_back_raw(){
     fetch("/api/init/back")
         .then((res) => {
             swup.loadPage({ url: res.url })
         })
+}
+
+function request_back(alert=true) {
+    if (alert){
+        show_question("Are you sure to go back?","Going back some setting will be lost, so remember to reset this configuration in case you want to go back!").then( asw => {
+            if (asw){
+                request_back_raw();
+            }
+        })
+    }else{
+        request_back_raw();
+    }
+
 }

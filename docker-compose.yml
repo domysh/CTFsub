@@ -10,16 +10,10 @@ services:
             - DEBUG=0
         depends_on:
             - mongo
-    attacker:
+            - engine
+    engine:
         restart: unless-stopped
-        build: ./attacker/
-        environment:
-            - DEBUG=0
-        depends_on:
-            - mongo
-    flag-sub:
-        restart: unless-stopped
-        build: ./flag_sub/
+        build: ./engine/
         environment:
             - DEBUG=0
         depends_on:

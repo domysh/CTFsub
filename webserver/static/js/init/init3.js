@@ -1,17 +1,36 @@
 function how_flag_regex_works() {
-  show_message("How Flag Regex Works 💡", `HELP TEXT`, false);
+  show_message("How Flag Regex Works 💡", `
+    <h5>Regexes can help you to better filter the flags:</h5>
+    Infact setting a flag regex, whatever is the output of your attack script, this will be
+    selected with the regex. <b>If in some service the format of the flag is different or 
+    doesn't exists, don't worry, you will be able to choose a custom regex for every attack you start.</b>
+    If you wnat to disable the regex filter, leave the text input blank.
+  `, false);
 }
 
 function how_temporised_flag_submit_works() {
-  show_message("How temporised flag submit works 💡", `HELP TEXT`, false);
+  show_message("How temporised flag submit works 💡", `
+    In some A/D CTFs, the game server can receve limited connection for the flag submit (usually for avoid DoS),
+    for this reason, in these cases it's important send as many submit as the game server can accept.<br<br>
+    Set a time range for submit a flag, after this set how many request are accepted in that range.
+    For instance, if the game server accept 5 request every minute, you could set the time range to 5*60 seconds and
+    ask to send 5 request in every range. 
+  `, false);
 }
 
 function how_multiple_flag_submit_works() {
-  show_message("How multiple flag submit works 💡", `HELP TEXT`, false);
+  show_message("How multiple flag submit works 💡", `
+  If your game server allow to send multiple flag, enable this option and specify the maximum number of flag that can be submitted in each request.
+  When you enable this option, the FLAG variable gived in the submit script will become a list of str (so a list of flags)!
+  `, false);
 }
 
 function how_flag_expire_works() {
-  show_message("How flag expire works 💡", `HELP TEXT`, false);
+  show_message("How flag expire works 💡", `
+  Usually in A/D competitions, the flags generated have a limited validity in the time: Consequently setting an expire time for the flags can avoid to send 
+  too old flags and allow to reduce the number of requests. Infact since the flag is stored in the database, it have a limited time for being submitted,
+  and after this, the flag is automatically considered invalid, enabling this option.
+  `, false);
 }
 
 function temporised_submit_change() {
@@ -123,12 +142,12 @@ async function reload_text() {
   window.editor.setValue(await get_setted_text());
 }
 
-function run_code_script(){
-  show_message("Ops...", "Not implemented Yet!");
-}
-
 function useless_function() {
   show_message("Useless", "I'm useless!");
+}
+
+function submit_flag_settings(){
+  show_message("Ops :|","Not implemented yet!")
 }
 
 init_monaco_editor();
@@ -147,18 +166,9 @@ Build next button function with backend data collect and frontend check parameth
 - Valid regex
 - valid python code for flag submit (syntax (In the backend))
 
-
-Build Try to run
-- Input to filter and manage
-- backend API for request to flag submit container to execute that code
-          Details:
-                WebServer =[socket:4040-json]> flag_sub
-                flag_sub =[mongo-json-static]> mongo
-                flag_sub =[web_interface/api-update]> WebServer
-                WebServer <[mongo]= mongo (data)
-
-                All this in a overlayed windows that appare clicking the button
-
+{
+    "libs":
+}
 
 
 */

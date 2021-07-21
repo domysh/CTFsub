@@ -1,4 +1,4 @@
-from pymongo import MongoClient, IndexModel, ASCENDING
+from pymongo import MongoClient
 from conf import MONGO_URL
 from utils import check_ip
 
@@ -7,22 +7,6 @@ def get_settings():
     settings = conn.main.static.find_one({"id":"settings"})
     conn.close()
     return settings
-
-
-def create_indexes():
-    conn = MongoClient(MONGO_URL)
-    conn.main.static.create_indexes([
-        IndexModel([("id",ASCENDING)],unique=True)
-    ])
-    conn.main.teams.create_indexes([
-        IndexModel([("ip",ASCENDING)],unique=True)
-    ])
-    conn.close()
-
-def create_settings():
-    conn = MongoClient(MONGO_URL)
-    conn.main.static.update_one({"id":"settings"},{"$setOnInsert":{"id":"settings","mode":"init"}},upsert=True)
-    conn.close()
 
 def updateInitState(i):
     conn = MongoClient(MONGO_URL)
@@ -35,6 +19,12 @@ def getInitState():
         return data["state"]
     else:
         return 0
+
+def get_engine_response(id_req):
+    conn = MongoClient(MONGO_URL)
+    res = conn.main.static.find_one({"id":"engine_"+id_req})
+    conn.close()
+    return res
 
 def get_flag_submit_code():
     data = get_settings()

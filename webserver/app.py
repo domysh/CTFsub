@@ -1,6 +1,6 @@
 from flask import Flask, redirect, request, render_template
 from datetime import timedelta
-from utils.db import getInitState
+from utils.db import getInitState, get_settings
 import conf, os, paths
 
 app = Flask(__name__)
@@ -15,9 +15,6 @@ app.register_blueprint(paths.app)
 
 @app.before_first_request
 def initial_operations():
-    from utils.db import create_indexes, get_settings, create_settings
-    create_indexes()
-    create_settings() 
     conf.APP_STATUS = get_settings()["mode"]
 
 @app.before_request

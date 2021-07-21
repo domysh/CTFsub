@@ -11,8 +11,8 @@ RUN pip install --no-cache-dir -r /execute/requirements.txt
 COPY . /execute/
 COPY ./supervisord.conf /etc/supervisor/supervisord.conf
 
-RUN adduser --disabled-password --home /execute --gecos '' execute
-RUN chown -R execute:root /execute && \
-  chmod -R 660 /execute && chmod -R u+X /execute
+RUN usermod -a -G root nobody
+RUN chown -R nobody:root /execute /root && \
+  chmod -R 660 /execute /root && chmod -R u+X /execute /root
 
 ENTRYPOINT ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]

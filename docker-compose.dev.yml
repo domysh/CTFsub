@@ -12,22 +12,14 @@ services:
             - ./webserver:/execute
         depends_on:
             - mongo
-    attacker:
+            - engine
+    engine:
         restart: unless-stopped
-        build: ./attacker/
+        build: ./engine/
         environment:
             - DEBUG=1
         volumes:
-            - ./attacker:/execute
-        depends_on:
-            - mongo
-    flag-sub:
-        restart: unless-stopped
-        build: ./flag_sub/
-        environment:
-            - DEBUG=1
-        volumes:
-            - ./flag_sub:/execute
+            - ./engine:/execute
         depends_on:
             - mongo
     mongo:

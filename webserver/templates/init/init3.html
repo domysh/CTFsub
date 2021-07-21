@@ -2,6 +2,8 @@
 
 {% block main %}
 <script src="/static/js/init-funcs.js"></script>
+<script src="/static/js/submitter.js"></script>
+
 <style>
     #code-editor{
         width: 70vw;
@@ -42,7 +44,7 @@
     <div class="flex-row">
         <div class="input-group flex-nowrap">
             <span class="input-group-text">Flag Regex</span>
-            <input type="text" class="form-control" placeholder="flg\{[A-Za-z0-9]{25}\}">
+            <input type="text" class="form-control" id="regex-input" placeholder="flg\{[A-Za-z0-9]{25}\}">
         </div>
         <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
     </div>
@@ -54,7 +56,14 @@
         </label>
     </div>
     <div style="margin-top: 10px;"></div>
-    <center><button class="btn btn-success" onclick="run_code_script()" style="min-width: 250px;"><b>TRY TO RUN</b> <i class="fas fa-play" style="margin-left: 20px;"></i></button></center>
+    <center>
+        <button class="btn btn-success" onclick="set_run_code_init()" style="min-width: 250px;margin-top: 5px;">
+          <b>TRY TO RUN</b> <i class="fas fa-play" style="margin-left: 20px;"></i>
+        </button>
+        <button class="btn btn-warning" onclick="pip_install_init()" style="min-width: 250px;margin-top: 5px;">
+          <b>PIP INSTALL</b> <i class="fas fa-cog" style="margin-left: 20px;"></i>
+        </button>
+    </center>
     <div style="margin-top: 10px;"></div>
 
 </div>
@@ -149,16 +158,17 @@
         </div>
       </div>
   </div>
-  
-  <script src="/static/js/init/init3.js"></script>
+    
 
+  <script src="/static/js/init/init3.js"></script>
+  
 {% endblock %}
 
 {% block footer %}
     <a type="button" onclick="request_back()" class="btn btn-danger">
         <i class="fas fa-angle-double-left"></i> Back
     </a>
-    <a type="button" onclick="send_team_list()" class="btn btn-danger">
+    <a type="button" onclick="submit_flag_settings()" class="btn btn-danger">
         Next <i class="fas fa-angle-double-right"></i>
     </a>
 {% endblock %}
