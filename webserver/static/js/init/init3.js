@@ -147,7 +147,8 @@ function useless_function() {
 }
 
 function submit_flag_settings(){
-  show_message("Ops :|","Not implemented yet!")
+  show_error("Not valid json sended! Read the instruction about the possible configurations of the json file");
+  request_next();
 }
 
 init_monaco_editor();

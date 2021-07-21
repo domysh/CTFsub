@@ -42,7 +42,6 @@ class SocketCommandHandler():
                     traceback.print_exc()
                 if "id" in data and not res is None:
                     import db
-                    if conf.DEBUG: print(command,"result", data["id"], ":", res)
                     db.create_response(
                         data["id"], res
                     )
@@ -88,13 +87,14 @@ def check_valid_regex(r):
         return False
 
 
-def is_valid_python(code):
+def get_syntax_errors(code):
     import ast
     try:
         ast.parse(code)
     except SyntaxError:
-        return False
-    return True
+        import traceback
+        return traceback.format_exc()
+    return None
 
 def install_libs(libs):
     import subprocess

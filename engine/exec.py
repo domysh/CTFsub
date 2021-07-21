@@ -2,9 +2,6 @@
 from utils import *
 import db
 
-import functools
-print = functools.partial(print, flush=True)
-
 class Inithandler(SKHandler):
     def mode_changed(self,data):
         self._stop()

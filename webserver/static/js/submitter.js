@@ -55,7 +55,7 @@ function run_code_script(){
   
   function set_run_code_init(){
     modify_modal(`
-      <div class="modal fade" id="try-to-run" tabindex="-1" aria-labelledby="try-to-runLabel" aria-hidden="true">
+      <div class="modal fade" id="try-to-run" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="try-to-runLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
           <div class="modal-content">
             <div class="modal-header">
@@ -129,7 +129,7 @@ function run_code_script(){
 
 function pip_install_init(){
     modify_modal(`
-    <div class="modal fade" id="pip-install" tabindex="-1" aria-labelledby="pip-installLabel" aria-hidden="true">
+    <div class="modal fade" id="pip-install" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="pip-installLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">

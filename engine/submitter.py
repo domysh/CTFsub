@@ -72,24 +72,27 @@ def emulate_flag_submit(texts, code, filter_regex, multiple_submit, max_submit, 
         if type(max_submit) != int or max_submit < 1:
             return {"status":False,"error":"Invalid Max Submit Value"}
         to_submit = []
-        for ele in flag_list[:max_submit]:
+        for ele in flag_list:
             try:
-                to_submit.append(ele.decode())
-            except UnicodeDecodeError:
-                pass
+                to_submit.append(ele.decode("iso-8859-1"))
+                if len(to_submit) == max_submit:
+                    break
+            except UnicodeDecodeError: pass
     else:
         flag_list = [ele for ele in flag_list if ele]
         if len(flag_list) > 0:
-            try:
-                to_submit = flag_list[0].decode()
-            except UnicodeDecodeError:
-                pass
-
-    if not to_submit:
+            for ele in flag_list:
+                try:
+                    to_submit = ele.decode("iso-8859-1")
+                    break
+                except UnicodeDecodeError: pass
+    
+    if to_submit is None:
         return {"status":False,"error":"No flag detected to send"}
 
-    if not utils.is_valid_python(code):
-        return {"status":False,"error":"Python code have syntax errors!"}
+    syntax_errors = utils.get_syntax_errors(code)
+    if syntax_errors:
+        return {"status":False,"error":"Python code have syntax errors!\n\n"+syntax_errors}
     try:
         return {"status":True,"result":submit_execute(code,to_submit)}
     except Exception as e:
