@@ -30,6 +30,23 @@ def prev_state():
     else:
         return redirect("/")
 
+@app.route("/state/<init_id>")
+def get_actual_state(init_id):
+    data = None
+    if init_id == "2":
+        data = db.get_teams()
+        if len(data) == 0:
+            data = None
+    elif init_id == "3":
+        data = db.get_flag_submit_config()
+    
+    if data is None:
+        return make_response(jsonify({"status":False,"msg":"No state found!"}), 200)
+    else:
+        return make_response(jsonify({"status":True,"data":data}), 200)
+
+
+
 def create_json_response(data,state):
     if data is None:
         data = {"status":True}
@@ -59,7 +76,7 @@ def init2(data):
 
 def init3(data):
     required_keys = ("code","regex","duplicated","temporised_submit","multiple_submit","flag_expiring")
-    if not all([ ele in data.keys() for ele in required_keys ]):
+    if not all( ele in data.keys() for ele in required_keys ):
         return {"status":False,"msg":"Invalid json request! Not all paramethers were sended"}
     
     if type(data["code"]) == str:

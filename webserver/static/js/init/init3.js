@@ -205,10 +205,44 @@ function submit_flag_settings(){
   });
 }
 
+function reload_config(){
+  fetch("/api/init/state/3")
+    .then( res => res.json() )
+    .then( res => {
+      if(res.status){
+        res = res.data
+        if (res.regex != null){
+          document.getElementById("regex-input").value = res.regex
+        }
+        document.getElementById("duplicated-flags").checked = res.duplicated
+        if (res.temporised_flags != null){
+          document.getElementById("temporised-flags").checked = true
+          document.getElementById("submit-time-range").value = res.temporised_flags.range
+          document.getElementById("attacks-in-a-range").value = res.temporised_flags.attacks
+          temporised_submit_change();
+        }
+
+        if (res.multiple != null){
+          document.getElementById("multiple-flags").checked = true
+          document.getElementById("multiple-flag-max-submit").value = res.multiple
+          multiple_submit_change();
+        }
+
+        if (res.expire != null){ 
+          document.getElementById("flag-expire").checked = true
+          document.getElementById("flag-expire-time").value = res.expire
+          flag_expire_change();
+        }
+      }
+    })
+}
+
 init_monaco_editor();
 temporised_submit_change();
 multiple_submit_change();
 flag_expire_change();
+
+reload_config();
 
 
 /*TODO

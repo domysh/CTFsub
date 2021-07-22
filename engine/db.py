@@ -22,6 +22,15 @@ def create_indexes():
     ])
     conn.close()
 
+def register_libraries(libs):
+    configs = get_settings()
+    installed_libs = libs
+    if "installed_libs" in configs:
+        installed_libs += configs["installed_libs"]
+    conn = MongoClient(conf.MONGO_URL)
+    conn.main.static.update_one({"id":"settings"},{"$set":{"installed_libs":installed_libs}})
+    conn.close()
+    
 def create_response(id_data,data):
     from datetime import datetime
     conn = MongoClient(conf.MONGO_URL)

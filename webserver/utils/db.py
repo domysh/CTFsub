@@ -56,6 +56,28 @@ def set_multiple_submit(multiple_submit):
 def set_flag_expiring(flag_expiring):
     set_config("flag_expiring", flag_expiring)
 
+def get_flag_submit_config():
+    configs = get_settings()
+    required_keys = ("submit_code", "flag_regex", "duplicated_flags_allowed", "temporised_submit", "flag_expiring", "multiple_submit")
+    if all( ele in configs.keys() for ele in required_keys ):
+        return {
+            "code":configs["submit_code"],
+            "regex":configs["flag_regex"],
+            "duplicated":configs["duplicated_flags_allowed"],
+            "multiple":configs["multiple_submit"],
+            "temporised_flags":configs["temporised_submit"],
+            "expire":configs["flag_expiring"]
+        }
+
+def get_teams():
+    conn = MongoClient(MONGO_URL)
+    teams = list(conn.main.teams.find({}))
+    conn.close()
+    res = {}
+    for tm in teams:
+        res[tm["name"]] = tm["ip"]
+    return res
+
 def init_teams(teams:dict):
     req = []
 

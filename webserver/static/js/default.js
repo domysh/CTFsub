@@ -176,6 +176,13 @@ async function wait_for_response(id,callback,tries = 0){
     
 }
 
+function escapeHtml(html){
+    var text = document.createTextNode(html);
+    var p = document.createElement('p');
+    p.appendChild(text);
+    return p.innerHTML;
+  }
+
 async function engine_request(data){
     let result = await api_req("/api/engine/request",data)
     return new Promise((resolve, reject) => {

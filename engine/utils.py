@@ -97,13 +97,14 @@ def get_syntax_errors(code):
     return None
 
 def install_libs(libs):
-    import subprocess
+    import subprocess, db
     libs = [ele.strip() for ele in libs.split() if ele and type(ele) == str and len(ele) > 0 and ele[0] != "-"]
     libs = [ele for ele in libs if ele]
     if len(libs) > 0:
         try:
             result = subprocess.run(["pip3","install","--user"]+libs, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             if result.returncode == 0:
+                db.register_libraries(libs)
                 return True, result.stdout
             else:
                 return False, result.stdout

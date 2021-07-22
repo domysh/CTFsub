@@ -206,6 +206,10 @@ async function upload_config() {
   }
 }
 function send_team_list() {
+  if (window.init2_old_status != null && document.getElementById("keep-old").checked){
+    request_next(window.init2_old_status);
+    return
+  }
   let ip_bytes = ["", "", "", ""];
   ip_bytes[0] = document.querySelector("#ip-byte-1 input").value;
   ip_bytes[1] = document.querySelector("#ip-byte-2 input").value;
@@ -303,3 +307,28 @@ function send_team_list() {
   generate_ips("", ip_bytes);
   request_next(ret);
 }
+
+function reload_config(){
+  fetch("/api/init/state/2")
+    .then( res => res.json() )
+    .then( res => {
+      if(res.status){
+        window.init2_old_status = res.data
+        document.getElementById("old-settings").style.display = ""
+      }else{
+        window.init2_old_status = null
+      }
+    })
+}
+
+function show_old_config(){
+  if (window.init2_old_status != null){
+    show_message(
+      "Setted configurations:",
+      `<pre><code class="language-json">${escapeHtml(JSON.stringify(window.init2_old_status,null,4))}</code></pre>`,
+      false
+    )
+  }
+}
+
+reload_config()

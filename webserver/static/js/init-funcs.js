@@ -37,7 +37,7 @@ function request_back_raw(){
         })
 }
 
-function request_back(alert=true) {
+function request_back(alert=false) {
     if (alert){
         show_question("Are you sure to go back?","Going back some setting will be lost, so remember to reset this configuration in case you want to go back!").then( asw => {
             if (asw){
