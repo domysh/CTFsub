@@ -1,4 +1,3 @@
-from re import RegexFlag
 from flask import Blueprint, redirect, request, jsonify, make_response
 import conf, utils
 from utils import db
