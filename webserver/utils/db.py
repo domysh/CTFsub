@@ -33,6 +33,29 @@ def get_flag_submit_code():
     else:
         return False
 
+def set_config(key, data):
+    conn = MongoClient(MONGO_URL)
+    conn.main.static.update_one({"id":"settings"},{"$set":{key:data}})
+    conn.close()
+
+def set_flag_submit_code(code):
+    set_config("submit_code", code)
+
+def set_flag_regex(regex):
+    set_config("flag_regex", regex)
+
+def set_flag_duplicated(duplicate):
+    set_config("duplicated_flags_allowed", duplicate)
+
+def set_temporised_submit(temporised_settings):
+    set_config("temporised_submit", temporised_settings)
+
+def set_multiple_submit(multiple_submit):
+    set_config("multiple_submit", multiple_submit)
+
+def set_flag_expiring(flag_expiring):
+    set_config("flag_expiring", flag_expiring)
+
 def init_teams(teams:dict):
     req = []
 

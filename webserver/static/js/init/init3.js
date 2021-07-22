@@ -147,8 +147,62 @@ function useless_function() {
 }
 
 function submit_flag_settings(){
-  show_error("Not valid json sended! Read the instruction about the possible configurations of the json file");
-  request_next();
+  let code = window.editor.getValue()
+  let regex = document.getElementById("regex-input").value
+  if (regex == "") regex = null
+  let duplicated = document.getElementById("duplicated-flags").checked
+  let temporised_flag = document.getElementById("temporised-flags").checked
+  if(temporised_flag){
+    let time_range = Number(document.getElementById("submit-time-range").value)
+    let attacks_in_range = Number(document.getElementById("attacks-in-a-range").value)
+    if (isNaN(time_range) || time_range <= 0){
+      show_error("Insert a valid numeric value for ( Temporised flag >> Submit time range )")
+      return
+    }
+    if (isNaN(attacks_in_range) || attacks_in_range <= 0 || !Number.isInteger(attacks_in_range) ){
+      show_error("Insert a valid numeric value for ( Temporised flag >> No. of submit in a time range )")
+      return
+    }
+    temporised_flag = {
+      "range":time_range,
+      "attacks":attacks_in_range
+    }
+  }else{
+    temporised_flag = null
+  }
+
+  let multiple_submit = document.getElementById("multiple-flags").checked
+  if (multiple_submit){
+    let max_flags_per_request = Number(document.getElementById("multiple-flag-max-submit").value)
+    if (isNaN(max_flags_per_request) || ! Number.isInteger(max_flags_per_request) || max_flags_per_request <= 0){
+      show_error("Insert a valid numeric value for ( Multiple submit >> Max flags per request )")
+      return
+    }
+    multiple_submit = max_flags_per_request
+  }else{
+    multiple_submit = null
+  }
+
+  let flag_expire = document.getElementById("flag-expire").checked
+  if(flag_expire){
+    let time_to_expire = Number(document.getElementById("flag-expire-time").value)
+    if (isNaN(time_to_expire) || ! Number.isInteger(time_to_expire) || time_to_expire <= 0){
+      show_error("Insert a valid numeric value for ( Flag Expire >> Time to expire )")
+      return
+    }
+    flag_expire = time_to_expire
+  }else{
+    flag_expire = null
+  }
+  
+  request_next({
+    "code":code,
+    "regex":regex,
+    "duplicated":duplicated,
+    "temporised_submit":temporised_flag,
+    "multiple_submit":multiple_submit,
+    "flag_expiring":flag_expire
+  });
 }
 
 init_monaco_editor();
