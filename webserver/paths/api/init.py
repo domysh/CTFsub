@@ -110,10 +110,10 @@ def init1(data):
                     "type":"pip_install",
                     "libs":" ".join(data["data"]["pip_install"])
                 })
-                for _ in range(100):
+                for _ in range(150):
                     res = get_engine_response(id_req)
                     if res is None:
-                        time.sleep(3)
+                        time.sleep(1)
                     else:
                         if res["data"][0]:
                             return {"goto":5}

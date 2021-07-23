@@ -13,7 +13,7 @@ function request_next(data = null,ondone = (data)=>{}) {
                 },
                 body: JSON.stringify(data)
             }).then(res => res.json())
-            .then(res => {ondone(res);solve_result(res)})
+            .then(res => {ondone(res);solve_result(res);})
     }
 }
 

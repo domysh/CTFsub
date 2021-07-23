@@ -67,6 +67,14 @@ function modify_modal(htmlCode) {
     code.innerHTML = htmlCode
 }
 
+function show_loader(){
+    modify_modal('<div class="loading-overlay"><div class="loading-wheel"></div></div>')
+}
+
+function hide_loader(){
+    modify_modal("")
+}
+
 function show_message(title, text, html_escape = true) {
     modify_modal(`
     <div class="modal fade" id="modal_message" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">

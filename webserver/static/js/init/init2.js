@@ -221,6 +221,10 @@ function send_team_list(next) {
   let range_counter = 0;
   for (let i = 0; i < ip_bytes.length; i++) {
     if (ip_bytes[i] == "") {
+      if (!next){
+        request_back()
+        return;
+      }
       show_error(
         "For go to next step, you have to select a range or upload a list of IP"
       );

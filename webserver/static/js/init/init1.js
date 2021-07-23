@@ -27,36 +27,12 @@ async function upload_config() {
       show_error("The file choosen is not a json file!");
       return;
     }
-    let modal = loading_modal();
-    request_next(data,(data)=>{
-      modal.hide()
-      if ("msg" in data){
-        show_error(data.msg)
+    show_loader();
+    request_next(data, (res)=>{
+      hide_loader();
+      if (res.status && "msg" in res){
+        show_error(res.msg)
       }
     });    
   }
-}
-
-function loading_modal(){
-  modify_modal(`
-  <div class="modal fade" id="loading_modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="loading_modalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="loading_modalLabel">Loading configurations ⌛</h5>
-      </div>
-      <div class="modal-body" id="loading_modal-body">
-        <div class="d-flex justify-content-center align-items-center" style="min-height:300px">
-          <div class="spinner-border" role="status"></div>
-          <span style="margin-left:10px">Loading...</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-  `)
-
-  var myModal = new bootstrap.Modal(document.getElementById('loading_modal'))
-    myModal.show()
-  return myModal
 }
