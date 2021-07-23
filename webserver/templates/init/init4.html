@@ -5,20 +5,60 @@
 <script src="/static/js/init-funcs.js"></script>
 
 <div style="margin-left: 20px;width: 80%; padding-top: 20px;">
-    <h1>Section Title</h1>
-    <p>Description of the section</p>
+    <h1>Attacker configs</h1>
+    <p>Configure the attacker for doing better and fast attacks</p>
 </div>
-<div>
+<div style="width: 65%;">
+    <h3 style="margin-top: 20px;">
+        <u>General settings</u>
+        <i class="fas fa-question question-btn" style="font-size: 80%;" onclick="general_setting_help()"></i>
+    </h3>
+    <div class="flex-row" style="margin-top: 20px;">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">Tick time</span>
+            <input type="number" class="form-control" step="1" min="1" placeholder="60" id="tick-time">
+            <span class="input-group-text">sec</span>
+        </div>
+        
+    </div>
+    <div class="input-group flex-nowrap" style="margin-top: 10px;">
+        <span class="input-group-text">Timeout</span>
+        <input type="number" class="form-control" step="1" min="1" placeholder="30" id="timeout">
+        <span class="input-group-text">sec</span>
+    </div>
+    <div class="input-group flex-nowrap" style="margin-top: 10px;">
+        <span class="input-group-text">Workers</span>
+        <input type="number" class="form-control" step="1" min="1" placeholder="12" id="workers">
+    </div>
+    <div class="form-check form-switch flex-row" style="margin-top: 40px;">
+        <input type="checkbox" onchange="auto_blacklist_change()" style="width: 60px;height: 25px;margin-right: 20px;" class="form-check-input mt-0" id="auto-blacklist">
+        <h3 style="margin-right: 10px;"><u>Auto Blacklist</u></h3> 
+        <i class="fas fa-question question-btn" onclick="auto_blacklist_help()"></i>
+    </div>
+    <div style="width: 90%;float: right;" id="auto-backlist-inputs">
+        <div class="input-group flex-nowrap" style="margin-top: 20px;">
+            <span class="input-group-text">Failure times</span>
+            <input type="number" class="form-control" step="1" min="1" placeholder="5" id="failure-times">
+        </div>
+        <div class="input-group flex-nowrap" style="margin-top: 10px;">
+            <span class="input-group-text">Retry after</span>
+            <input type="number" class="form-control" step="1" min="1" placeholder="300" id="retry-after">
+            <span class="input-group-text">sec</span>
+        </div>
+
+    </div>
 
 </div>
+
+
 <script src="/static/js/init/init4.js"></script>
 {% endblock %}
 
 {% block footer %}
-    <a type="button" onclick="request_back()" class="btn btn-danger">
+    <a type="button" onclick="send_attack_configs(false)" class="btn btn-danger">
         <i class="fas fa-angle-double-left"></i> Back
     </a>
-    <a type="button" onclick="next_func()" class="btn btn-danger">
+    <a type="button" onclick="send_attack_configs(true)" class="btn btn-danger">
         Next <i class="fas fa-angle-double-right"></i>
     </a>
 {% endblock %}

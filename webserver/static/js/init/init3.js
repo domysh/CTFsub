@@ -143,10 +143,10 @@ async function reload_text() {
 }
 
 function useless_function() {
-  show_message("Useless", "I'm useless!");
+  show_message('▶️ WTF❓',`<a href='https://www.youtube.com/watch?v=dQw4w9WgXcQ' target='_blanck' >https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>`,false)
 }
 
-function submit_flag_settings(){
+function submit_flag_settings(next){
   let code = window.editor.getValue()
   let regex = document.getElementById("regex-input").value
   if (regex == "") regex = null
@@ -194,8 +194,7 @@ function submit_flag_settings(){
   }else{
     flag_expire = null
   }
-  
-  request_next({
+  move_init(next,{
     "code":code,
     "regex":regex,
     "duplicated":duplicated,
@@ -243,21 +242,3 @@ multiple_submit_change();
 flag_expire_change();
 
 reload_config();
-
-
-/*TODO
-Verify (and/or complete) /api/flag-submit-code/get backend
-
-Full HELP texts in help show functions
-
-Build next button function with backend data collect and frontend check paramethers
-- Valid numbers
-- Valid regex
-- valid python code for flag submit (syntax (In the backend))
-
-{
-    "libs":
-}
-
-
-*/

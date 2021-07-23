@@ -1,0 +1,31 @@
+{% extends "fullwidth.html" %}
+
+{% block main %}
+<script src="/static/js/init-funcs.js"></script>
+<div style="margin-left: 20px;width: 60%; padding-top: 60px;">
+    <center>
+        <h1 style="text-transform: uppercase;font-weight: bolder;">Configuration Done!</h1>
+        <b><p>Start CTFsub and start hacking!</p></b>
+    </center>
+
+    <div style="margin-top: 80px;"></div>
+    
+    <center>
+        <h6>Download configuration:</h6>
+        <button class="btn btn-warning" onclick="window.open('/api/config/download','_blank')" >Download <i class="fas fa-download"></i></button>
+    </center>
+
+    <div style="margin-top: 80px;"></div>
+
+    <a type="button" onclick="request_back()" class="btn btn-danger">
+        <i class="fas fa-angle-double-left"></i> Edit configs
+    </a>
+    <a type="button" style="float: right;" onclick="show_message('▶️ WTF❓',`<a href='https://www.youtube.com/watch?v=dQw4w9WgXcQ' target='_blanck' >https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>`,false)" class="btn btn-success">
+            START<i class="fas fa-play" style="margin-left: 10px;"></i>
+    </a>
+
+
+</div>
+
+<script src="/static/js/init/init5.js"></script>
+{% endblock %}

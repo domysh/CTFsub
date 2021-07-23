@@ -56,6 +56,18 @@ def set_multiple_submit(multiple_submit):
 def set_flag_expiring(flag_expiring):
     set_config("flag_expiring", flag_expiring)
 
+def set_attack_tick_time(attack_tick_time):
+    set_config("attack_tick_time", attack_tick_time)
+
+def set_attack_timeout(attack_timeout):
+    set_config("attack_timeout", attack_timeout)
+
+def set_attack_workers(attack_workers):
+    set_config("attack_workers", attack_workers)
+
+def set_autoblacklist(autoblacklist):
+    set_config("autoblacklist", autoblacklist)
+
 def get_flag_submit_config():
     configs = get_settings()
     required_keys = ("submit_code", "flag_regex", "duplicated_flags_allowed", "temporised_submit", "flag_expiring", "multiple_submit")
@@ -68,14 +80,50 @@ def get_flag_submit_config():
             "temporised_flags":configs["temporised_submit"],
             "expire":configs["flag_expiring"]
         }
+def get_attack_config():
+    configs = get_settings()
+    required_keys = ("attack_tick_time","attack_timeout","attack_workers","autoblacklist")
+    if all( ele in configs.keys() for ele in required_keys ):
+        return {
+            "attack_tick_time":configs["attack_tick_time"],
+            "attack_timeout":configs["attack_timeout"],
+            "attack_workers":configs["attack_workers"],
+            "autoblacklist":configs["autoblacklist"]
+        }
+
+def get_config_dict():
+    configs = get_settings()
+    inits = {
+        "2":get_teams(),
+        "3":{
+            "code":configs["submit_code"],
+            "regex":configs["flag_regex"],
+            "duplicated":configs["duplicated_flags_allowed"],
+            "temporised_submit":configs["temporised_submit"],
+            "multiple_submit":configs["multiple_submit"],
+            "flag_expiring":configs["flag_expiring"]
+        },
+        "4":{
+            "attack_tick_time":configs["attack_tick_time"],
+            "attack_timeout":configs["attack_timeout"],
+            "attack_workers":configs["attack_workers"],
+            "autoblacklist":configs["autoblacklist"]
+        }
+    }
+    pip_install = configs["installed_libs"] if "installed_libs" in configs else []
+
+    return {
+        "init":inits,
+        "pip_install":pip_install,
+    }
+
 
 def get_teams():
     conn = MongoClient(MONGO_URL)
-    teams = list(conn.main.teams.find({}))
-    conn.close()
     res = {}
-    for tm in teams:
+    for tm in conn.main.teams.find({}):
         res[tm["name"]] = tm["ip"]
+    conn.close()
     return res
 
 def init_teams(teams:dict):

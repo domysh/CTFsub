@@ -27,6 +27,7 @@ def register_libraries(libs):
     installed_libs = libs
     if "installed_libs" in configs:
         installed_libs += configs["installed_libs"]
+    installed_libs = list(set(installed_libs))
     conn = MongoClient(conf.MONGO_URL)
     conn.main.static.update_one({"id":"settings"},{"$set":{"installed_libs":installed_libs}})
     conn.close()

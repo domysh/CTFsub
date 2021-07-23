@@ -100,6 +100,7 @@ def install_libs(libs):
     import subprocess, db
     libs = [ele.strip() for ele in libs.split() if ele and type(ele) == str and len(ele) > 0 and ele[0] != "-"]
     libs = [ele for ele in libs if ele]
+    libs = list(set(libs))
     if len(libs) > 0:
         try:
             result = subprocess.run(["pip3","install","--user"]+libs, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)

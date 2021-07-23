@@ -1,5 +1,5 @@
-from flask import Blueprint, json, request, jsonify
-from . import init, flag_submit_code
+from flask import Blueprint, request, jsonify
+from . import init, flag_submit_code, config
 import conf
 from utils.db import get_engine_response
 
@@ -7,6 +7,7 @@ app = Blueprint('api', __name__)
 
 app.register_blueprint(init.app, url_prefix="/init")
 app.register_blueprint(flag_submit_code.app, url_prefix='/flag-submit-code')
+app.register_blueprint(config.app, url_prefix='/config')
 
 @app.route("/engine/request", methods=["POST"])
 def send_engine_request():

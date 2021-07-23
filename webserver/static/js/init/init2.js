@@ -205,9 +205,9 @@ async function upload_config() {
     request_next(res);
   }
 }
-function send_team_list() {
+function send_team_list(next) {
   if (window.init2_old_status != null && document.getElementById("keep-old").checked){
-    request_next(window.init2_old_status);
+    move_init(next,window.init2_old_status);
     return
   }
   let ip_bytes = ["", "", "", ""];
@@ -305,7 +305,7 @@ function send_team_list() {
     }
   }
   generate_ips("", ip_bytes);
-  request_next(ret);
+  move_init(next,ret);
 }
 
 function reload_config(){
