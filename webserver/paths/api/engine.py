@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request
 import conf
 from utils.db import get_engine_response
 
@@ -10,12 +10,12 @@ def send_engine_request():
     data = request.get_json()
     id_req = send_request(data)
     if conf.DEBUG: print("Sended request:", data,flush=True)
-    return make_response(jsonify({"id":id_req}),200)
+    return {"id":id_req}
 
 @app.route("/response/<req_id>")
 def get_engine_response_api(req_id):
     resp = get_engine_response(req_id)
     if resp is None:
-        return make_response(jsonify({"status":False,"error":"No data found"}),200)
+        return {"status":False,"error":"No data found"}
     del resp["_id"]
-    return make_response(jsonify({"status":True,"data":resp}),200)
+    return {"status":True,"data":resp}

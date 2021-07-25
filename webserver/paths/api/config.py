@@ -1,5 +1,5 @@
 
-from flask import Blueprint, json, redirect, jsonify, make_response, Response
+from flask import Blueprint, json, redirect, Response
 import conf
 from utils import db
 

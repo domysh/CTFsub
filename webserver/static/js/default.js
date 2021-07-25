@@ -1,3 +1,4 @@
+
 window.history.pushState(null, null, window.location.href);
 window.onpopstate = function() {
     window.history.go(1);
@@ -41,9 +42,18 @@ window.addEventListener("load", (e) => {
     window.swup = swup
     on_new_page()
 
+
     swup.on("contentReplaced", () => {
         on_new_page()
     })
+
+    window.skio = io();
+
+    skio.on("reload-page",()=>{
+        try { swup.loadPage({ url: location.pathname }) }
+        catch(_){ window.location.reload() }
+    })
+    
 
 })
 
@@ -200,4 +210,5 @@ async function engine_request(data){
         })
     })
 }
+
 

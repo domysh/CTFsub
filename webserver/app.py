@@ -1,7 +1,8 @@
-from flask import Flask, redirect, request, render_template
+from flask import Flask, redirect, request, render_template, session
 from datetime import timedelta
 from utils.db import getInitState, get_settings
-import conf, os, paths
+import conf, os, paths, secrets
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 app.secret_key = os.urandom(32) #This will change at every restart
@@ -10,6 +11,9 @@ app.secret_key = os.urandom(32) #This will change at every restart
 app.config['BASE_URL'] = "http://localhost:5050/"
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=365)
 app.debug = conf.DEBUG
+app.config["ALLOWED_SESSION_SINGLE_ACCESS"] = None
+
+conf.SKIO = SocketIO(app)
 
 app.register_blueprint(paths.app)
 
@@ -19,14 +23,26 @@ def initial_operations():
 
 @app.before_request
 def prev_action():
-    if  conf.APP_STATUS == "init" and (not request.path.startswith("/api/") and not request.path.startswith("/static/")): #Init status
-        state = getInitState()
-        if request.path != f"/init/{state}":
-            return redirect(f"/init/{state}") #Automatic redirect
+    if "id" not in session:
+        session["id"] = secrets.token_hex(32)
+    if conf.APP_STATUS == "init" and not request.path.startswith("/static/"):
+        if app.config["ALLOWED_SESSION_SINGLE_ACCESS"] is None:
+            app.config["ALLOWED_SESSION_SINGLE_ACCESS"] = session["id"]
+        if app.config["ALLOWED_SESSION_SINGLE_ACCESS"] != session["id"]:
+            if request.path == "/api/allow_single_access" or request.path == "/api/single_access":
+                pass
+            elif request.path.startswith("/api/"):
+                return redirect("/")
+            else:
+                return render_template("single_access_required.html",
+                    title="One Access allowed!",
+                    description="During the configuration only one browser is allowed"
+                )
+        elif not request.path.startswith("/api/"): #Init status
+            state = getInitState()
+            if request.path != f"/init/{state}":
+                return redirect(f"/init/{state}") #Automatic redirect
 
 if __name__ == "__main__":
-    if conf.DEBUG:
-        app.run(host="0.0.0.0",port=9999,debug=conf.DEBUG)
-    else:
-        os.system("uwsgi --workers 3 --http 0.0.0.0:9999 --thunder-lock --static-map /static=/execute/static --enable-threads -w app:app")
+    conf.SKIO.run(app, host="0.0.0.0",port=9999,debug=conf.DEBUG)
 

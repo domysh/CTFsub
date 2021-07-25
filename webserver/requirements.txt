@@ -3,3 +3,5 @@ urllib3
 uWSGI
 Flask
 pymongo
+flask-socketio
+eventlet

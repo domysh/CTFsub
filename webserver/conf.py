@@ -6,3 +6,6 @@ MONGO_URL = "mongodb://mongo/"
 
 ENGINE_ADDR = "engine"
 ENGINE_PORT = 4040
+
+
+SKIO = None

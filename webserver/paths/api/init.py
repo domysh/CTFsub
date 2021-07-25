@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, request, jsonify, make_response
+from flask import Blueprint, redirect, request
 import conf, utils
 from utils import db
 app = Blueprint('init', __name__)
@@ -30,6 +30,7 @@ def next_state():
     if conf.APP_STATUS == "init":
         res = load_init_state(True)
         if not res is None:
+            conf.SKIO.emit("reload-page", {}, broadcast=True)
             return res
     return redirect("/")
 
@@ -41,6 +42,7 @@ def prev_state_forced():
             return redirect("/init/0")
         else:
             db.updateInitState(state-1)
+            conf.SKIO.emit("reload-page", {}, broadcast=True)
             return redirect(f"/init/{state-1}")
     else:
         return redirect("/")
@@ -59,9 +61,9 @@ def get_actual_state(init_id):
             data = db.get_attack_config()
         
         if data is None:
-            return make_response(jsonify({"status":False,"msg":"No state found!"}), 200)
+            return {"status":False,"msg":"No state found!"}
         else:
-            return make_response(jsonify({"status":True,"data":data}), 200)
+            return {"status":True,"data":data}
     else:
         return redirect("/")
 
@@ -86,7 +88,7 @@ def create_json_response(data,state,go_next):
         data["redirect"] = f"/init/{goto}"
         db.updateInitState(goto)
     
-    return make_response(jsonify(data), 200)
+    return data
 
 def init1(data):
     if data["config_method"] == "create":

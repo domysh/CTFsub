@@ -19,7 +19,7 @@ function request_next(data = null,ondone = (data)=>{}) {
 
 function solve_result(res) {
     if (res.status) {
-        swup.loadPage({ url: res.redirect })
+        //swup.loadPage({ url: res.redirect })
     } else {
         show_error(res.msg)
     }
@@ -32,7 +32,7 @@ function show_error(text) {
 function request_back_raw(){
     fetch("/api/init/back")
         .then((res) => {
-            swup.loadPage({ url: res.url })
+            //swup.loadPage({ url: res.url })
         })
 }
 
@@ -73,3 +73,14 @@ function move_init(next,data = null){
         request_back(data)
     }
 }
+
+function init_single_access_ctrl(){
+    fetch("/api/single_access")
+        .then(res => res.json())
+        .then(res => {
+            if(!res.status){
+                window.location.reload()
+            }
+        })
+}
+

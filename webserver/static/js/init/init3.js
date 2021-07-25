@@ -94,19 +94,6 @@ except requests.exceptions.Timeout: #Probably the gameserver isn't up
 `;
   return def;
 }
-
-async function get_setted_text() {
-  let res = get_default_text();
-  await fetch("/api/flag-submit-code/get")
-    .then((r) => r.json())
-    .then((r) => {
-      if (r.status) {
-        res = r.data;
-      }
-    });
-  return res;
-}
-
 function init_monaco_editor() {
   require.config({
     paths: {
@@ -117,7 +104,7 @@ function init_monaco_editor() {
     window.editor = monaco.editor.create(
       document.getElementById("code-editor"),
       {
-        value: await get_setted_text(),
+        value: get_text_editor(),
         language: "python",
         automaticLayout: true,
         minimap: {
@@ -138,8 +125,20 @@ function reset_text() {
   window.editor.setValue(get_default_text());
 }
 
-async function reload_text() {
-  window.editor.setValue(await get_setted_text());
+function reload_text() {
+  if (window.flag_submit_code == undefined){
+    window.flag_submit_code = get_default_text()
+  }
+  if (window.editor != undefined){
+    window.editor.setValue(window.flag_submit_code);
+  }
+}
+
+function get_text_editor(){
+  if (window.flag_submit_code == undefined){
+    window.flag_submit_code = get_default_text()
+  }
+  return window.flag_submit_code
 }
 
 function useless_function() {
@@ -205,11 +204,16 @@ function submit_flag_settings(next){
 }
 
 function reload_config(){
+  window.flag_submit_code = get_default_text()
   fetch("/api/init/state/3")
     .then( res => res.json() )
     .then( res => {
       if(res.status){
         res = res.data
+        if (res.code != null){
+          window.flag_submit_code = res.code
+          reload_text()
+        }
         if (res.regex != null){
           document.getElementById("regex-input").value = res.regex
         }
