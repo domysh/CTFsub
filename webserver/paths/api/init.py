@@ -1,4 +1,5 @@
 from flask import Blueprint, redirect, request
+from flask_socketio import send
 import conf, utils
 from utils import db
 app = Blueprint('init', __name__)
@@ -16,6 +17,11 @@ def load_init_state(go_next):
         return create_json_response(init3(request.get_json()),state,go_next)
     if state == 4:
         return create_json_response(init4(request.get_json()),state,go_next)
+    if state == 5 and go_next == True:
+        from utils.engine import send_request
+        db.set_running()
+        send_request({"type":"mode_changed"})
+        return {"status":True}
 
 @app.route("/save", methods=["GET","POST"])
 def save_state():
@@ -66,8 +72,6 @@ def get_actual_state(init_id):
             return {"status":True,"data":data}
     else:
         return redirect("/")
-
-
 
 def create_json_response(data,state,go_next):
     if data is None:

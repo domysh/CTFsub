@@ -8,13 +8,6 @@
     <p>Only one browser can access to CTFsub during the configuration.</p>
 </div>
 
-<button class="btn btn-success" onclick="get_single_access()">Switch access to this browser session</button>
-
-
-<script>
-    function get_single_access(){
-        fetch("/api/allow_single_access")
-    }
-</script>
+<button class="btn btn-success" onclick="fetch('/api/allow_single_access')">Switch access to this browser session</button>
 {% endblock %}
 

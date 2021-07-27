@@ -129,12 +129,12 @@ function show_message(title, text, html_escape = true) {
 function show_question(title, text, html_escape = true) {
     window.resolve_question = null
     modify_modal(`
-    <div class="modal fade" id="modal_message" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
+    <div class="modal fade" id="modal_message" data-bs-backdrop="static" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="modal_title">Modal title</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <button type="button" class="btn-close" onclick="window.resolve_question(false)" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body" id="modal_text">
         </div>

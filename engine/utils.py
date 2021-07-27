@@ -16,7 +16,6 @@ class SocketCommandHandler():
             conn, _ = self._sk.accept()
             data = conn.recv(self._max_data)
             conn.close()
-            if conf.DEBUG: print("Connection recived: data =>",data)
             try: data = json.loads(data)
             except json.JSONDecodeError: continue
 
@@ -36,6 +35,7 @@ class SocketCommandHandler():
             if callable(func):
                 res = None
                 try:
+                    if conf.DEBUG: print("Command recived:",command, flush=True)
                     res = func(data)
                 except Exception:
                     import traceback
@@ -71,6 +71,7 @@ def start_attacker():
     conf.ATTACKER = Thread(target=attacker.attacker)
     conf.ATTACKER.daemon = True
     conf.ATTACKER.start()
+    if conf.DEBUG: print("Attacker module started!")
 
 def start_submitter():
     from threading import Thread
@@ -78,6 +79,7 @@ def start_submitter():
     conf.SUBMITTER = Thread(target=submitter.submitter)
     conf.SUBMITTER.daemon = True
     conf.SUBMITTER.start()
+    if conf.DEBUG: print("Submitter module started!")
 
 def check_valid_regex(r):
     try:

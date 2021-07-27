@@ -21,11 +21,22 @@ class Inithandler(SKHandler):
 class Handler(SKHandler):
     def pip_install(self, data):
         return install_libs(data["libs"])
+    def flag_submit_test(self,data):
+        from submitter import emulate_flag_submit
+        return emulate_flag_submit(
+            texts=data["text"],
+            code=data["code"],
+            filter_regex=data["regex"] if "regex" in data else None,
+            multiple_submit=data["multiple_submit"],
+            max_submit=data["max_submit"] if data["multiple_submit"] else None,
+            send_duplicate=data["duplicate"]
+        )
 
 def main():
     db.init()
     while db.get_settings()["mode"] == "init":
         Inithandler()
+    if conf.DEBUG: print("Engine setted in running mode!", flush=True)
     init_modules()
     Handler()
     wait_modules()

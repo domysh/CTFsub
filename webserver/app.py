@@ -17,6 +17,10 @@ conf.SKIO = SocketIO(app)
 
 app.register_blueprint(paths.app)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect("/")
+
 @app.before_first_request
 def initial_operations():
     conf.APP_STATUS = get_settings()["mode"]
@@ -42,6 +46,9 @@ def prev_action():
             state = getInitState()
             if request.path != f"/init/{state}":
                 return redirect(f"/init/{state}") #Automatic redirect
+    if conf.APP_STATUS == "run":
+        if request.path.startswith("/init/"):
+            return redirect("/")
 
 if __name__ == "__main__":
     conf.SKIO.run(app, host="0.0.0.0",port=9999,debug=conf.DEBUG)

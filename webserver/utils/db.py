@@ -20,6 +20,20 @@ def getInitState():
     else:
         return 0
 
+def set_config_mode():
+    import conf
+    conn = MongoClient(MONGO_URL)
+    conn.main.static.update_one({"id":"settings"},{"$set":{"mode":"init","state":1}})
+    conf.APP_STATUS = "init"
+    conn.close()
+
+def set_running():
+    import conf
+    conn = MongoClient(MONGO_URL)
+    conn.main.static.update_one({"id":"settings"},{"$set":{"mode":"run"},"$unset":{"state":""}})
+    conf.APP_STATUS = "run"
+    conn.close()
+
 def get_engine_response(id_req):
     conn = MongoClient(MONGO_URL)
     res = conn.main.static.find_one({"id":"engine_"+id_req})
