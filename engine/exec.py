@@ -31,6 +31,9 @@ class Handler(SKHandler):
             max_submit=data["max_submit"] if data["multiple_submit"] else None,
             send_duplicate=data["duplicate"]
         )
+    def mode_changed(self,data):
+        #Advice The submitter and the attacker about the new configs
+        pass
 
 def main():
     db.init()

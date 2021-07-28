@@ -182,18 +182,6 @@ async function api_req(path, data){
     }).then( res => res.json())
 }
 
-async function wait_for_response(id,callback,tries = 0){
-    if (tries > 100) callback("Timeouut Error")
-    let response = await fetch("/api/engine/response/"+id)
-        .then( res => res.json())
-    if(response.status){
-        callback(response.data)
-        return response.data
-    }
-    setTimeout(()=>{wait_for_response(id,callback,tries+1)},3000)
-    
-}
-
 function escapeHtml(html){
     var text = document.createTextNode(html);
     var p = document.createElement('p');
@@ -201,14 +189,17 @@ function escapeHtml(html){
     return p.innerHTML;
   }
 
-async function engine_request(data){
-    let result = await api_req("/api/engine/request",data)
+function engine_request(data){
     return new Promise((resolve, reject) => {
-        wait_for_response(result.id,(res)=>{
-            if (res != null) resolve(res)
-            else reject(res)
+        api_req("/api/engine/request",data).then( res => {
+            if (res.status){
+                resolve(res.data)
+            }else{
+                reject(res.error)
+            }
         })
     })
+    
 }
 
 

@@ -8,3 +8,7 @@ app.register_blueprint(init.app, url_prefix='/init')
 @app.route("/")
 def home_ctfsub():
     return render_template("home.html", description="CTFsub attacker")
+
+@app.route("/addattack")
+def add_attack():
+    return render_template("addattack.html", description="CTFsub attacker")

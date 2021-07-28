@@ -1,5 +1,4 @@
 from flask import Blueprint, redirect, request
-from flask_socketio import send
 import conf, utils
 from utils import db
 app = Blueprint('init', __name__)
@@ -110,22 +109,19 @@ def init1(data):
                 return {"status":False,"msg":"Invalid file uploaded!"}
             if len(data["data"]["pip_install"]) > 0:
                 from utils.engine import send_request
-                from utils.db import get_engine_response
+                from utils.db import wait_engine_response
                 import time
                 id_req = send_request({
                     "type":"pip_install",
                     "libs":" ".join(data["data"]["pip_install"])
                 })
-                for _ in range(150):
-                    res = get_engine_response(id_req)
-                    if res is None:
-                        time.sleep(1)
-                    else:
-                        if res["data"][0]:
-                            return {"goto":5}
-                        else:
-                            return {"status":True,"msg":"Python libraries install failed! (pip raised an error!). The configs has been loaded, you can continue to use CTFsub!", "goto":5}
-                return {"status":True,"msg":"Python libraries install failed! (Timeout error on the response by CTFsub engine). The configs has been loaded, you can continue to use CTFsub!", "goto":5}
+                res = wait_engine_response(id_req)
+                if res is None:
+                    return {"msg":"Python libraries install failed! (Timeout error on the response by CTFsub engine). The configs has been loaded, you can continue to use CTFsub!", "goto":5}
+                elif res["data"][0]:
+                    return {"goto":5}
+                else:
+                    return {"msg":"Python libraries install failed! (pip raised an error!). The configs has been loaded, you can continue to use CTFsub!", "goto":5}
             return {"goto":5}
         except KeyError:
             import traceback

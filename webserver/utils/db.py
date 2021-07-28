@@ -1,6 +1,7 @@
+from threading import Timer
 from pymongo import MongoClient
 from conf import MONGO_URL
-from utils import check_ip
+from utils import check_ip, timeout
 
 def get_settings():
     conn = MongoClient(MONGO_URL)
@@ -39,6 +40,20 @@ def get_engine_response(id_req):
     res = conn.main.static.find_one({"id":"engine_"+id_req})
     conn.close()
     return res
+
+def wait_engine_response(id_req):
+    conn = MongoClient(MONGO_URL)
+    @timeout(120)
+    def wait_for():
+        with conn.main.static.watch([{'$match': {'operationType': 'insert'}}]) as stream:
+            for ele in stream:
+                ele = ele["fullDocument"]
+                if "id" in ele and ele["id"] == "engine_"+id_req:
+                    return ele           
+    try:
+        return wait_for()
+    except KeyboardInterrupt:
+        return None
 
 def get_flag_submit_code():
     data = get_settings()

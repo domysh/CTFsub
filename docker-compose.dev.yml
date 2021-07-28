@@ -25,6 +25,7 @@ services:
     mongo:
         image: mongo
         restart: unless-stopped
+        command: /usr/bin/mongod --bind_ip_all --replSet rs0 --journal --dbpath /data/db
         volumes:
             - ./mongodbdata:/data/db
         ports: 

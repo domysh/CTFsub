@@ -1,7 +1,16 @@
 from pymongo import MongoClient, IndexModel, ASCENDING
-import conf
+from pymongo.errors import OperationFailure
+import conf, time
 
 def init():
+    try:
+        conn = MongoClient(conf.MONGO_URL)
+        conn.admin.command("replSetInitiate",{"_id":"rs0","members":[{ "_id": 0, "host": "127.0.0.1:27017" }]})
+        time.sleep(.5) # DB auto set itself as primary
+    except OperationFailure as e: #Operation already done (code == 23) 
+        if e.code != 23: raise e 
+    finally:
+        conn.close()
     create_indexes()
     create_settings()
 

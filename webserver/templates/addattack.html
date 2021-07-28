@@ -1,0 +1,75 @@
+{% extends "fullwidth.html" %}
+
+{% block main %}
+<script src="/static/js/submitter.js"></script>
+
+<style>
+    #code-editor{
+        width: 70vw;
+        height: 60vh;
+    }
+    #code-editor .monaco-editor{
+        width: 70vw !important;
+        height: 60vh !important;
+    }
+
+    .margin-around{
+        margin: 20px;
+    }
+</style>
+<div style="display: flex;margin: 20px;width: 80%; padding: 40px 0;align-items: center;">
+    <a href="/" class="btn btn-danger"><i class="fas fa-angle-left"></i></a>
+    <div style="margin-left:30px;" >
+        <h1>Add an attack</h1>
+        <p>Write the code for attack the other teams, set your settings, and run! </p>
+    </div>
+</div>
+<div class="browser">
+    <div class="browser-navigation-bar">
+        <i onclick="useless_function()"></i>
+        <i onclick="useless_function()"></i>
+        <i onclick="useless_function()"></i>
+        <!-- Place your URL into <input> below -->
+        <input value="Python code editor - New attack" disabled/>
+        <i class="fas fa-times" onclick="reset_text()"
+            data-bs-toggle="tooltip" data-bs-placement="top" title="Reset script to initial example"></i>
+        <i class="fas fa-redo-alt" onclick="reload_text()" aria-hidden="true"
+        data-bs-toggle="tooltip" data-bs-placement="top" title="Set the script to the last saved version"></i>
+    </div>
+
+    <div class="browser-container">
+        <div id="code-editor"></div>  
+    </div>
+</div><br>
+<div style="width: 70%;">
+    <div style="margin-top: 30px;"></div>
+    <div class="flex-row">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">Flag Regex</span>
+            <input type="text" class="form-control" id="regex-input" placeholder="flg\{[A-Za-z0-9]{25}\}">
+        </div>
+        <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
+    </div>
+    <div style="margin-top: 10px;"></div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="duplicated-flags">
+        <label class="form-check-label" for="duplicated-flags">
+            <b>Send Duplicated Flags</b>
+        </label>
+    </div>
+    <div style="margin-top: 10px;"></div>
+    <center>
+        <button class="btn btn-success" onclick="set_run_code_init()" style="min-width: 250px;margin-top: 5px;">
+          <b>TRY TO RUN</b> <i class="fas fa-play" style="margin-left: 20px;"></i>
+        </button>
+        <button class="btn btn-warning" onclick="pip_install_init()" style="min-width: 250px;margin-top: 5px;">
+          <b>PIP INSTALL</b> <i class="fas fa-cog" style="margin-left: 20px;"></i>
+        </button>
+    </center>
+    <div style="margin-top: 10px;"></div>
+
+</div>
+
+<script src="/static/js/addattack.js"></script>
+  
+{% endblock %}
