@@ -17,13 +17,36 @@
         margin: 20px;
     }
 </style>
-<div style="display: flex;margin: 20px;width: 80%; padding: 40px 0;align-items: center;">
-    <a href="/" class="btn btn-danger"><i class="fas fa-angle-left"></i></a>
+<div style="display: flex;margin: 20px;width: 80%; padding: 40px 0;padding-bottom: 0px ;align-items: center;">
+    <a href="/" class="btn btn-danger"><i class="fas fa-angle-left" style="font-size: 200%;"></i></a>
     <div style="margin-left:30px;" >
         <h1>Add an attack</h1>
         <p>Write the code for attack the other teams, set your settings, and run! </p>
     </div>
 </div>
+
+<div style="width: 70%;">
+    <div class="flex-row">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">Attack Name</span>
+            <input type="text" class="form-control" id="regex-input" placeholder="Awesome Sql Injection!">
+        </div>
+        <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
+    </div>
+    <div style="margin-top: 20px;"></div>
+    <div class="flex-row">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">TCP port verify</span>
+            <span class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" id="tcp-verify">
+            </span>
+            <input type="number" class="form-control" step="1" min="1" max="65535" id="tcp-verify-port" placeholder="8080" readonly>
+
+        </div>
+        <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
+    </div>
+</div>
+<div style="margin-top: 30px;"></div>
 <div class="browser">
     <div class="browser-navigation-bar">
         <i onclick="useless_function()"></i>
@@ -42,31 +65,52 @@
     </div>
 </div><br>
 <div style="width: 70%;">
-    <div style="margin-top: 30px;"></div>
-    <div class="flex-row">
-        <div class="input-group flex-nowrap">
-            <span class="input-group-text">Flag Regex</span>
-            <input type="text" class="form-control" id="regex-input" placeholder="flg\{[A-Za-z0-9]{25}\}">
-        </div>
-        <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
-    </div>
-    <div style="margin-top: 10px;"></div>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="duplicated-flags">
-        <label class="form-check-label" for="duplicated-flags">
-            <b>Send Duplicated Flags</b>
-        </label>
-    </div>
     <div style="margin-top: 10px;"></div>
     <center>
-        <button class="btn btn-success" onclick="set_run_code_init()" style="min-width: 250px;margin-top: 5px;">
-          <b>TRY TO RUN</b> <i class="fas fa-play" style="margin-left: 20px;"></i>
+        <button class="btn btn-success" onclick="set_run_code_attack_init()" style="min-width: 250px;margin-top: 5px;">
+          <b>TRY TO ATTACK</b> <i class="fas fa-play" style="margin-left: 20px;"></i>
         </button>
         <button class="btn btn-warning" onclick="pip_install_init()" style="min-width: 250px;margin-top: 5px;">
           <b>PIP INSTALL</b> <i class="fas fa-cog" style="margin-left: 20px;"></i>
         </button>
     </center>
+    <div style="margin-top: 30px;"></div>
+    <div class="flex-row">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">Custom timeout</span>
+            <span class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" id="custom-timeout">
+            </span>
+            <input type="number" min="1" class="form-control" id="custom-timeout-time" placeholder="120" readonly>
+            <span class="input-group-text">sec</span>
+        </div>
+        <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
+    </div>
     <div style="margin-top: 10px;"></div>
+    <div class="flex-row">
+        <div class="input-group flex-nowrap">
+            <span class="input-group-text">Custom flag regex</span>
+            <span class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" id="tcp-verify">
+            </span>
+            <input type="text" class="form-control" id="regex-input" placeholder="Str4ng3_Fl4g\{[A-Z]{50}\}">
+        </div>
+        <i class="fas fa-question question-btn" onclick="how_flag_regex_works()"></i>
+    </div>
+    <div style="margin-top: 10px;"></div>
+    <div class="" style="margin-bottom: 10px;">
+        <div class="input-group flex-nowrap justify-content-center">
+            <span class="input-group-text">Auto Blacklist</span>
+            <span class="input-group-text">
+                <input class="form-check-input mt-0" type="checkbox" id="auto-blacklist" checked>
+            </span>
+            <span class="input-group-text">
+                <i class="fas fa-question question-btn" onclick=""></i>
+            </span>
+        </div>
+        
+    </div>
+    
 
 </div>
 

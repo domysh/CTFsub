@@ -25,7 +25,11 @@ def back_to_conf():
     conf.SKIO.emit("reload-page", {}, broadcast=True)
     return redirect("/")
 
-
+@app.route("/config")
+def conf_get():
+    data = db.get_settings()
+    del data["_id"]
+    return data
 
 @app.route("/single_access")
 def have_single_access():

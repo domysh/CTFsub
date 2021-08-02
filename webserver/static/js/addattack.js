@@ -9,34 +9,7 @@ function how_flag_regex_works() {
   }
   
   function get_default_text() {
-    let def = `"""
-  Insert here the code for submit the flag
-  in this code there is just defined the FLAG variable that contain the flag to submit.
-  [ if you enable multiple flag submit, FLAG variable will contain an array of flags ]
-  
-  Manage also the status of the submit with the variable STATUS (assigned to FAILED by default)
-  Possible states to assign: SUCCESS, FAILED, INVALID
-  """
-  #Example of implementation:
-  import requests
-  try:
-      status = requests.post("https://gameserver.example.com/api/flag_submit", 
-                      data={
-                          "flag":FLAG,
-                          "team_id":"this_is_a_team_id"
-                      }, timeout=3
-      ).status_code
-      if status != 200:
-          if status == 429:
-              STATUS = FAILED #Too many requests to game server
-          elif status == 400:
-              STATUS = INVALID #The flag submitted is not a valid flag
-      else:
-          STATUS = SUCCESS #Flag submited successfully!
-      
-  except requests.exceptions.Timeout: #Probably the gameserver isn't up
-      STATUS = FAILED
-  `;
+    let def = ``;
     return def;
   }
   function init_monaco_editor() {
@@ -71,19 +44,19 @@ function how_flag_regex_works() {
   }
   
   function reload_text() {
-    if (window.flag_submit_code == undefined){
-      window.flag_submit_code = get_default_text()
+    if (window.attack_code == undefined){
+      window.attack_code = get_default_text()
     }
     if (window.editor != undefined){
-      window.editor.setValue(window.flag_submit_code);
+      window.editor.setValue(window.attack_code);
     }
   }
   
   function get_text_editor(){
-    if (window.flag_submit_code == undefined){
-      window.flag_submit_code = get_default_text()
+    if (window.attack_code == undefined){
+      window.attack_code = get_default_text()
     }
-    return window.flag_submit_code
+    return window.attack_code
   }
   
   function useless_function() {
@@ -94,13 +67,82 @@ function how_flag_regex_works() {
   }
   
   function reload_config(){
-    window.flag_submit_code = get_default_text()
+    window.attack_code = get_default_text()
   }
   
-  init_monaco_editor();
-  temporised_submit_change();
-  multiple_submit_change();
-  flag_expire_change();
+  function set_run_code_attack_init(){
+    modify_modal(`
+      <div class="modal fade" id="try-to-run" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="try-to-runLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="try-to-runLabel">Try to execute the attack 🔥</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="try-to-run-body">
   
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-success" id="try-to-run-btn" onclick="run_code_script()"><i class="fas fa-play"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `)
+    document.getElementById("try-to-run-btn").style.display = "";
+    document.getElementById("try-to-run-body").innerHTML = `
+    <div class="alert alert-success" role="alert">
+      TODO!
+    </div>
+    <div class="input-group">
+      <span class="input-group-text">Target ip</span>
+      <input type="text" class="form-control" id="run-input"></input>
+    </div>
+    `
+  
+    var myModal = new bootstrap.Modal(document.getElementById('try-to-run'))
+    myModal.show()
+  }
+  
+  function set_run_code_attack_error(text){
+    document.getElementById("try-to-run-btn").style.display = "none";
+    document.getElementById("try-to-run-body").innerHTML = `
+    <h3><u>An error occurred during the submit</u></h3>
+    <h5>Message:</h5>
+    <div class="alert alert-danger" id="try-to-run-inner-alert" role="alert">
+      
+    </div>
+    `
+    document.getElementById("try-to-run-inner-alert").innerText = text
+  }
+  function set_run_code_attack_success(status, output){
+    document.getElementById("try-to-run-btn").style.display = "none";
+    let additional_html = ""
+    if (status == "FAILED"){
+      additional_html = `
+      <div class="alert alert-warning"role="alert">
+        In a real situation the flag will be sended next possible time 
+      </div>
+      `
+    }else if (status == "INVALID"){
+      additional_html = `
+      <div class="alert alert-warning"role="alert">
+        In a real situation the flag won't be sended
+      </div>
+      `
+    }
+    document.getElementById("try-to-run-body").innerHTML = `
+    <h2 id="status-try-to-run"></h2>
+    ${additional_html}
+    <h4>Generated output</h4>
+    <pre class="alert alert-primary" id="try-to-run-inner-alert" role="alert">
+    </pre>
+  `
+  document.getElementById("status-try-to-run").innerText = `Flag status: ${status}`
+  document.getElementById("try-to-run-inner-alert").innerText = output
+}
+
+  init_monaco_editor();
   reload_config();
   

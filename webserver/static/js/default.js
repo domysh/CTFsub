@@ -202,4 +202,15 @@ function engine_request(data){
     
 }
 
+function useless_function() {
+    show_message('▶️ WTF❓',`<a href='https://www.youtube.com/watch?v=dQw4w9WgXcQ' target='_blanck' >https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>`,false)
+}
+
+async function get_config(){
+    if (window.CTFsub_config == undefined){
+        window.CTFsub_config = await fetch("/api/config").then( res => res.json())
+    }
+    return window.CTFsub_config
+}
+
 

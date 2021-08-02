@@ -17,6 +17,22 @@ Teams' IPs configuration
 
 <img title="" src="./screen1.png" alt="">
 
+Development in pause:
+
+## TODO
+
+- Improve the layout of the add attack page
+
+- Create front-end and back-end of addattack page
+
+- Change Settings: Add some limitations in init pages (block init/0 init/1 init/2)
+
+- Start to create the submitter and the attacker in the CTFsub-engine
+
+- Create the main page with a table showing how are going the attacks, number of flag accepted, etc...
+
+
+
 ---
 
 <a href="https://domysh.com">Project by DomySh</a>

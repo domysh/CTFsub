@@ -141,10 +141,6 @@ function get_text_editor(){
   return window.flag_submit_code
 }
 
-function useless_function() {
-  show_message('▶️ WTF❓',`<a href='https://www.youtube.com/watch?v=dQw4w9WgXcQ' target='_blanck' >https://www.youtube.com/watch?v=dQw4w9WgXcQ</a>`,false)
-}
-
 function submit_flag_settings(next){
   let code = window.editor.getValue()
   let regex = document.getElementById("regex-input").value

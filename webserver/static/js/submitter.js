@@ -53,7 +53,7 @@ function run_code_script(){
       })
   }
   
-  function set_run_code_init(){
+  function set_run_code_submitter_init(){
     modify_modal(`
       <div class="modal fade" id="try-to-run" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="try-to-runLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
