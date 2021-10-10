@@ -2,7 +2,7 @@
 
 # A flag submitter and attacker for CTFs A/D
 
-## Archived having no support in the development! If you are interested in the project contact me [me@domysh.com](mailto://me@domysh.com)
+## Archived having no support for the development! If you are interested in the project contact me [me@domysh.com](mailto://me@domysh.com)
 
 ---
 
