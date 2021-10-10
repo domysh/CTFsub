@@ -2,6 +2,8 @@
 
 # A flag submitter and attacker for CTFs A/D
 
+## Archived having no support in the development! If you are interested in the project contact me [me@domysh.com](mailto://me@domysh.com)
+
 ---
 
 CTFsub now have another face, and will be easy to use and comfortable.
